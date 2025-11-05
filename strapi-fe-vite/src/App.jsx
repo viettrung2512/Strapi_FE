@@ -1,9 +1,14 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
-import Login from '../../Login';
-import Signup from './components/Signup';
-import ProtectedRoute from './components/ProtectedRoute';
-import Dashboard from './components/Dashboard';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+// import Login from '../../Login';
+// import Signup from './components/Signup';
+// import ProtectedRoute from './components/ProtectedRoute';
+import Home from "./pages/Home";
 
 function App() {
   return (
@@ -11,17 +16,11 @@ function App() {
       <Router>
         <div className="App">
           <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route path="/" element={<Navigate to="/dashboard" />} />
+            {/* {/* <Route path="/login" element={<Login />} /> */}
+            <Route path="/home" element={<Home />} />
+
+
+            <Route path="/" element={<Navigate to="/home" />} />
           </Routes>
         </div>
       </Router>
