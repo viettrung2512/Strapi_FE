@@ -17,11 +17,18 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const initAuth = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
       try {
         const userData = await checkAuth();
         setUser(userData);
       } catch (error) {
-        console.log('Not authenticated');
+        localStorage.removeItem("token");
+        console.log("Token invalid");
       } finally {
         setLoading(false);
       }
@@ -30,34 +37,44 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
+  // ✅ Login + lưu token
   const login = async (email, password) => {
-    const userData = await authLogin(email, password);
-    setUser(userData);
-    return userData;
+    const res = await authLogin(email, password);
+    
+    localStorage.setItem("token", res.jwt);
+    setUser(res.user);
+
+    return res.user;
   };
 
-  const register = async (userData) => {
-    const newUser = await authRegister(userData);
-    setUser(newUser);
-    return newUser;
+  // ✅ Register + auto login
+  const register = async (data) => {
+    const res = await authRegister(data);
+
+    localStorage.setItem("token", res.jwt);
+    setUser(res.user);
+
+    return res.user;
   };
 
+  // ✅ Logout
   const logout = () => {
     authLogout();
+    localStorage.removeItem("token");
     setUser(null);
   };
 
-  const value = {
-    user,
-    login,
-    register,
-    logout,
-    loading,
-    isAuthenticated: !!user
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        register,
+        logout,
+        loading,
+        isAuthenticated: !!user
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
