@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "./strapi-fe-vite/src/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import GradientButton from "./Button";
+import GradientButton from "./strapi-fe-vite/src/components/Button";
 
 export default function Login() {
   const [email, setEmail] = useState("");
