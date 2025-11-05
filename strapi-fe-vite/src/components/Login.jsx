@@ -1,9 +1,8 @@
-"use client";
-
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import GradientButton from "./Button";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -113,10 +112,12 @@ export default function Login() {
               </div>
 
               {/* Submit Button */}
-              <button
-                type="submit"
+              <GradientButton
+                type="primary"
+                htmlType="submit"
                 disabled={loading}
-                className="w-full py-4 px-6 rounded-2xl text-white font-bold bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300 shadow-2xl transform hover:-translate-y-0.5 flex items-center justify-center gap-3 text-lg"
+                size="large"
+                className="w-full py-4 px-6 rounded-2xl text-white font-bold transition-all duration-300 shadow-2xl transform hover:-translate-y-0.5 flex items-center justify-center gap-3 text-lg"
               >
                 {loading ? (
                   <>
@@ -126,7 +127,7 @@ export default function Login() {
                 ) : (
                   "Đăng nhập"
                 )}
-              </button>
+              </GradientButton>
 
               {/* Links */}
               <div className="flex justify-between text-base mt-4">
