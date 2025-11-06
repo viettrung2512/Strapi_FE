@@ -14,7 +14,7 @@ import ResetPassword from "./components/forms/ResetPassword";
 
 function App() {
   return (
-    <AuthProvider>
+     <AuthProvider>
       <Router>
         <div className="App">
           <Routes>

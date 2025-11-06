@@ -4,44 +4,6 @@ import { DownOutlined } from "@ant-design/icons";
 // import { Image } from "antd";
 const { Header } = Layout;
 import { Avatar, Space } from "antd";
-// import Logo from "../../public/images/login2";
-
-// const KwaysLogo = () => (
-//   <svg
-//     width="150"
-//     height="40"
-//     viewBox="0 0 150 40"
-//     xmlns="http://www.w3.org/2000/svg"
-//     style={{ marginRight: "24px" }}
-//   >
-//     {/* Placeholder for complex logo */}
-//     <g fill="#0052CC">
-//       <circle cx="20" cy="20" r="18" fill="#0052CC" opacity="0.3" />
-//       <circle cx="10" cy="10" r="8" fill="#DE350B" />
-//       <circle cx="30" cy="10" r="8" fill="#FFAB00" />
-//       <circle cx="20" cy="30" r="8" fill="#00B8D9" />
-//     </g>
-//     <text
-//       x="50"
-//       y="22"
-//       fontFamily="Arial, sans-serif"
-//       fontSize="20"
-//       fontWeight="bold"
-//       fill="#172B4D"
-//     >
-//       kways
-//     </text>
-//     <text
-//       x="50"
-//       y="34"
-//       fontFamily="Arial, sans-serif"
-//       fontSize="10"
-//       fill="#5E6C84"
-//     >
-//       way to success
-//     </text>
-//   </svg>
-// );
 
 const appBarItems = [
   {
@@ -102,8 +64,6 @@ const items = [
         Đăng xuất
       </a>
     ),
-    // icon: <SmileOutlined />,
-    // disabled: true,
   },
 ];
 const processedItems = appBarItems.map((item) => {
@@ -126,16 +86,15 @@ const AppBar = () => {
     <Layout>
       <Header
         style={{
-          position: "sticky",
+          position: "fixed",
           top: 0,
           zIndex: 1,
           width: "100%",
           height: "90px",
           display: "flex",
           alignItems: "center",
-          background: "rgba(255, 255, 255, 0.9)",
+          background: "rgba(255, 255, 255, 0.97)",
           padding: "0 48px",
-          // borderBottom: "1px solid #dfe1e6",
         }}
       >
         <img
