@@ -1,9 +1,39 @@
 import React from "react";
 import { Card } from "antd";
-import { Tag, Flex } from "antd";
+import { Tag, Flex, Spin } from "antd";
 import { Typography } from "antd";
+import parse from "html-react-parser";
+import { formatDistanceToNow } from "date-fns";
+import { vi } from "date-fns/locale";
 const { Paragraph } = Typography;
-const LargeArticleCard = () => {
+import { API_URL } from "../utils/constant";
+
+const LargeArticleCard = ({ article }) => {
+  if (!article) {
+    return (
+      <div
+        style={{
+          height: "100%",
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          padding: "48px",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
+  const imgFormat = article.image?.formats?.large || article.image;
+  const imgUrl = imgFormat?.url
+    ? `${API_URL}${imgFormat.url}`
+    : "/placeholder.jpg";
+
+  const updatedAtDate = new Date(article.updatedAt);
+  const timeAgo = formatDistanceToNow(updatedAtDate, {
+    addSuffix: true, // Thêm "trước" hoặc "sau"
+    locale: vi, // Dịch sang tiếng Việt
+  });
   return (
     <div
       style={{
@@ -23,26 +53,33 @@ const LargeArticleCard = () => {
         <img
           width="100%"
           height="100%"
-          src="/images/SEO_6_1_629e1800b2.png"
+          src={imgUrl}
           alt="ArticleImage"
           style={{
             borderRadius: "16px",
+            objectFit: "cover",
           }}
+          loading="lazy"
         />
         <div>
-          <Tag
-            style={{
-              fontSize: "14px",
-              fontFamily: "Inter, sans-serif",
-              padding: "4px 10px",
-              margin: "16px 0 16px 0",
-              borderRadius: "8px",
-            }}
-            bordered={false}
-            color="red"
-          >
-            Hiệu suất
-          </Tag>
+          {article.categories.map((tag) => (
+            <Tag
+              style={{
+                fontSize: "14px",
+                fontFamily: "Inter, sans-serif",
+                padding: "4px 10px",
+                margin: "16px 8px 16px 0",
+                borderRadius: "8px",
+              }}
+              bordered={false}
+              color={tag.color}
+              key={tag.id}
+            >
+              {tag.name
+                ? tag.name.charAt(0).toUpperCase() + tag.name.slice(1)
+                : ""}
+            </Tag>
+          ))}
           <h5
             style={{
               fontSize: "20px",
@@ -51,7 +88,7 @@ const LargeArticleCard = () => {
               color: "#232D3A",
             }}
           >
-            Thiết lập KPI theo SMART: Mục tiêu đúng, kết quả đúng Thiết lập
+            {article.seo.metaTitle}
           </h5>
           <Paragraph
             ellipsis={{ rows: 3 }}
@@ -60,24 +97,16 @@ const LargeArticleCard = () => {
               fontFamily: "Inter, sans-serif",
             }}
           >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
+            {parse(article.seo?.metaDescription)}
           </Paragraph>
           <div
             style={{
               fontSize: "14px",
               fontFamily: "Inter, sans-serif",
-              //   marginBottom: "8px",
               color: "gray",
-              //   color: "#232D3A",
             }}
           >
-            7 tháng trước
+            {timeAgo}
           </div>
         </div>
       </Card>

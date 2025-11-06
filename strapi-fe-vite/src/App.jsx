@@ -4,7 +4,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
+// import { AuthProvider } from "./contexts/AuthContext";
 // import Login from '../../Login';
 // import Signup from './components/Signup';
 // import ProtectedRoute from './components/ProtectedRoute';
@@ -12,7 +12,7 @@ import Home from "./pages/Home";
 
 function App() {
   return (
-    <AuthProvider>
+    // <AuthProvider>
       <Router>
         <div className="App">
           <Routes>
@@ -24,7 +24,7 @@ function App() {
           </Routes>
         </div>
       </Router>
-    </AuthProvider>
+    // </AuthProvider>
   );
 }
 

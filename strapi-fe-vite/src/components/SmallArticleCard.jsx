@@ -1,8 +1,37 @@
 import React from "react";
 import { Card } from "antd";
-import { Tag, Flex } from "antd";
+import { Tag, Flex, Spin } from "antd";
+// import parse from "html-react-parser";
+import { formatDistanceToNow } from "date-fns";
+import { vi } from "date-fns/locale";
+import { API_URL } from "../utils/constant";
 
-const SmallArticleCard = () => {
+const SmallArticleCard = ({ article }) => {
+  if (!article) {
+    return (
+      <div
+        style={{
+          height: "100%",
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          padding: "48px",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
+  const imgFormat = article.image?.formats?.large || article.image;
+  const imgUrl = imgFormat?.url
+    ? `${API_URL}${imgFormat.url}`
+    : "/placeholder.jpg";
+
+  const updatedAtDate = new Date(article.updatedAt);
+  const timeAgo = formatDistanceToNow(updatedAtDate, {
+    addSuffix: true,
+    locale: vi,
+  });
   return (
     <div>
       <Card
@@ -11,11 +40,10 @@ const SmallArticleCard = () => {
         style={{
           borderRadius: "16px",
           background: "white",
-          height: "163px",
+          height: "160px",
           minWidth: "480px",
           width: "100%",
         }}
-        // bodyStyle={{ height: "100%" }}
       >
         <Flex
           gap="small"
@@ -27,53 +55,34 @@ const SmallArticleCard = () => {
             <img
               width={140}
               height={103}
-              src="/images/SEO_6_1_629e1800b2.png"
+              src={imgUrl}
               alt="ArticleImage"
               style={{
                 borderRadius: "16px",
+                objectFit: "cover",
               }}
+              loading="lazy"
             />
           </div>
           <div>
-            <Tag
-              style={{
-                fontSize: "14px",
-                fontFamily: "Inter, sans-serif",
-                padding: "4px 10px",
-                marginBottom: "16px",
-                borderRadius: "8px",
-              }}
-              bordered={false}
-              color="red"
-            >
-              Hiệu suất
-            </Tag>
-            <Tag
-              style={{
-                fontSize: "14px",
-                fontFamily: "Inter, sans-serif",
-                padding: "4px 10px",
-                marginBottom: "8px",
-                borderRadius: "8px",
-              }}
-              bordered={false}
-              color="red"
-            >
-              Hiệu suất
-            </Tag>
-            <Tag
-              style={{
-                fontSize: "14px",
-                fontFamily: "Inter, sans-serif",
-                padding: "4px 10px",
-                marginBottom: "8px",
-                borderRadius: "8px",
-              }}
-              bordered={false}
-              color="red"
-            >
-              Hiệu suất
-            </Tag>
+            {article.categories.map((tag) => (
+              <Tag
+                style={{
+                  fontSize: "14px",
+                  fontFamily: "Inter, sans-serif",
+                  padding: "4px 10px",
+                  margin: "16px 8px 16px 0",
+                  borderRadius: "8px",
+                }}
+                bordered={false}
+                color={tag.color}
+                key={tag.id}
+              >
+                {tag.name
+                  ? tag.name.charAt(0).toUpperCase() + tag.name.slice(1)
+                  : ""}
+              </Tag>
+            ))}
             <h4
               style={{
                 fontSize: "16px",
@@ -84,19 +93,18 @@ const SmallArticleCard = () => {
                 Color: "#232D3A",
               }}
             >
-              Thiết lập KPI theo SMART: Mục tiêu đúng, kết quả đúng
+              {article.title}
             </h4>
 
             <div
               style={{
                 fontSize: "14px",
                 fontFamily: "Inter, sans-serif",
-                // marginBottom: "8px",
                 color: "gray",
                 Color: "#232D3A",
               }}
             >
-              7 tháng trước
+              {timeAgo}
             </div>
           </div>
         </Flex>
