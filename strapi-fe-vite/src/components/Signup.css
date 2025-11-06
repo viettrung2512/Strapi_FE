@@ -1,6 +1,7 @@
 .signup-container {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .signup-left {
@@ -50,7 +51,7 @@
 }
 
 .signup-logo {
-  width: 24rem;
+  width: 20rem;
   filter: drop-shadow(0 20px 13px rgba(0, 0, 0, 0.1));
 }
 
@@ -64,11 +65,10 @@
 
 .signup-card {
   width: 100%;
-  max-width: 28rem;
-  padding: 2rem;
+  max-width: 40rem;
+  padding: 4rem;
   background: white;
   border-radius: 1rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .signup-heading {
@@ -81,7 +81,10 @@
 
 .signup-btn {
   width: 100%;
-  margin-top: 1rem;
+  border-radius: 50px;
+  font-weight: 600;
+  height: 48px !important;
+  font-size: 16px !important;
 }
 
 .signup-footer-text {

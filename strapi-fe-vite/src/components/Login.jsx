@@ -51,7 +51,8 @@ export default function Login() {
         <div className="login-left-content">
           <h2 className="login-title">KIMEI</h2>
           <p className="login-slogan">
-            “Một tổ chức có hiệu suất cao khi trao quyền cho đội ngũ...”
+            “Một tổ chức có hiệu suất cao khi trao quyền cho đội ngũ để hiện
+            thực những mục tiêu khát vọng.”
           </p>
           <img
             src="/images/kimei-logo-vertical.png"

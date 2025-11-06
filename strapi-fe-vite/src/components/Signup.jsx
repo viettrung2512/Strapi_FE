@@ -6,95 +6,97 @@ import {
   EyeInvisibleOutlined,
   UserOutlined,
   LockOutlined,
-  PlusOutlined,
-  LoadingOutlined,
 } from "@ant-design/icons";
-import { Form, Input, Button, message, Upload } from "antd";
+import { Form, Input, Button, message } from "antd";
 import "./Signup.css";
 import axios from "axios";
+import AvatarUpload from "./AvatarUpload";
 
 export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState('');
-  const [uploading, setUploading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
-
-  const handlePreview = async (file) => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
-    setPreviewUrl(file.url || file.preview);
-  };
-
-  const getBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
-  };
-
-  const beforeUpload = async (file) => {
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-    if (!isJpgOrPng) {
-      message.error('Bạn chỉ có thể tải lên JPG/PNG!');
-      return false;
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error('Ảnh phải nhỏ hơn 2MB!');
-      return false;
-    }
-
-    setAvatarFile(file);
-    const preview = await getBase64(file);
-    setPreviewUrl(preview);
-    return false;
-  };
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      // First upload avatar if exists
-      let avatarId = null;
-      if (avatarFile) {
-        const formData = new FormData();
-        formData.append("files", avatarFile);
+      console.log("🚀 Starting registration process...");
 
-        const uploadRes = await axios.post("http://localhost:1337/api/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        if (uploadRes.data && uploadRes.data[0]) {
-          avatarId = uploadRes.data[0].id;
+      // BƯỚC 1: Đăng ký user trước (không có avatar)
+      const res = await axios.post(
+        "http://localhost:1337/api/auth/local/register",
+        {
+          username: values.fullName,
+          email: values.email,
+          password: values.password,
+          // KHÔNG gửi avatar ở bước này
         }
-      }
-
-      // Then register user
-      const res = await axios.post("http://localhost:1337/api/auth/local/register", {
-        username: values.fullName,
-        email: values.email,
-        password: values.password,
-        avatar: avatarId, // Link avatar to user
-      });
+      );
 
       const { jwt, user } = res.data;
+      console.log("✅ User registered successfully:", user.id);
+
+      // Lưu token ngay lập tức
       localStorage.setItem("token", jwt);
       localStorage.setItem("user", JSON.stringify(user));
+
+      // BƯỚC 2: Nếu có avatar, upload SAU KHI có token
+      if (avatarFile) {
+        try {
+          console.log("📸 Uploading avatar...");
+          const formData = new FormData();
+          formData.append("files", avatarFile);
+          formData.append("field", "avatar"); // Quan trọng: chỉ định field
+
+          const uploadRes = await axios.post(
+            "http://localhost:1337/api/upload",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${jwt}`, // Sử dụng token mới nhận được
+              },
+            }
+          );
+
+          if (uploadRes.data && uploadRes.data[0]) {
+            const avatarId = uploadRes.data[0].id;
+            console.log("✅ Avatar uploaded, ID:", avatarId);
+
+            // BƯỚC 3: Cập nhật user với avatar
+            await axios.put(
+              `http://localhost:1337/api/users/${user.id}`,
+              {
+                avatar: avatarId,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${jwt}`,
+                },
+              }
+            );
+            console.log("✅ User updated with avatar");
+          }
+        } catch (uploadError) {
+          console.error("❌ Avatar upload error:", uploadError);
+          // Vẫn tiếp tục dù upload avatar thất bại
+          message.warning("Đăng ký thành công nhưng upload ảnh thất bại");
+        }
+      }
 
       message.success("Đăng ký thành công!");
       navigate("/dashboard");
     } catch (err) {
-      console.error(err);
+      console.error("❌ Registration error:", err);
       message.error(err.response?.data?.error?.message || "Đăng ký thất bại!");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAvatarChange = (file) => {
+    setAvatarFile(file);
   };
 
   return (
@@ -105,7 +107,8 @@ export default function Signup() {
         <div className="signup-left-content">
           <h2 className="signup-title">KIMEI</h2>
           <p className="signup-slogan">
-            "Một tổ chức có hiệu suất cao khi trao quyền cho đội ngũ..."
+            "Một tổ chức có hiệu suất cao khi trao quyền cho đội ngũ để hiện
+            thực những mục tiêu khát vọng."
           </p>
           <img
             src="/images/kimei-logo-vertical.png"
@@ -135,39 +138,7 @@ export default function Signup() {
                 </span>
               }
             >
-              <div className="avatar-upload-container">
-                <Upload
-                  name="avatar"
-                  listType="picture-circle"
-                  className="avatar-uploader"
-                  showUploadList={false}
-                  beforeUpload={beforeUpload}
-                  maxCount={1}
-                >
-                  {previewUrl ? (
-                    <div className="avatar-preview">
-                      <img src={previewUrl} alt="Avatar" />
-                    </div>
-                  ) : (
-                    <div className="upload-placeholder">
-                      {uploading ? <LoadingOutlined /> : <PlusOutlined />}
-                      <div className="upload-text">Tải ảnh lên</div>
-                    </div>
-                  )}
-                </Upload>
-                {previewUrl && (
-                  <Button 
-                    type="link" 
-                    onClick={() => {
-                      setPreviewUrl('');
-                      setAvatarFile(null);
-                    }}
-                    className="remove-avatar"
-                  >
-                    Xóa ảnh
-                  </Button>
-                )}
-              </div>
+              <AvatarUpload onAvatarChange={handleAvatarChange} />
             </Form.Item>
 
             <Form.Item
@@ -233,21 +204,11 @@ export default function Signup() {
             </Link>
           </p>
 
-          <p className="signup-copy">© 2025 KIMEI. Tất cả quyền được bảo lưu.</p>
+          <p className="signup-copy">
+            © 2025 KIMEI. Tất cả quyền được bảo lưu.
+          </p>
         </div>
       </div>
     </div>
   );
 }
-
-module.exports = {
-  upload: {
-    config: {
-      providerOptions: {
-        localServer: {
-          maxSize: 2 * 1024 * 1024, // 2MB in bytes
-        },
-      },
-    },
-  },
-};

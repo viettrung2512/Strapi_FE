@@ -11,12 +11,13 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
-    "antd": "^5.28.0",
+    "@strapi/provider-email-nodemailer": "^5.30.0",
+    "antd": "^5.x.x",
     "antd-style": "^3.7.1",
     "axios": "^1.13.2",
     "lucide-react": "^0.552.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-router-dom": "^7.9.5"
   },
   "devDependencies": {
