@@ -6,11 +6,11 @@ import {
 } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import Home from "./pages/Home";
-import Login from "./components/Login";
-import Signup from "./components/Signup";
-import Profile from "./components/Profile";
-import ForgotPassword from "./components/ForgotPassword";
-import ResetPassword from "./components/ResetPassword";
+import Login from "./components/forms/Login";
+import Signup from "./components/forms/Signup";
+import Profile from "./components/forms/Profile";
+import ForgotPassword from "./components/forms/ForgotPassword";
+import ResetPassword from "./components/forms/ResetPassword";
 
 function App() {
   return (

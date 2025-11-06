@@ -4,7 +4,7 @@ import { DownOutlined } from "@ant-design/icons";
 // import { Image } from "antd";
 const { Header } = Layout;
 import { Avatar, Space } from "antd";
-// import Logo from "../../public/images/Logo-kways";
+// import Logo from "../../public/images/login2";
 
 // const KwaysLogo = () => (
 //   <svg
@@ -139,7 +139,7 @@ const AppBar = () => {
         }}
       >
         <img
-          src="/images/Logo-kways.png"
+          src="/images/login2.png"
           width="150"
           height="40"
           alt="Kimei"

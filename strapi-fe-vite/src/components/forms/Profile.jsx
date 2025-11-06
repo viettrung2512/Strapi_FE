@@ -1,0 +1,567 @@
+import { useState, useEffect } from "react";
+import { Form, Input, message, Tabs, Card } from "antd";
+import {
+  UserOutlined,
+  LockOutlined,
+  SafetyOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined,
+} from "@ant-design/icons";
+import styled from "styled-components";
+import axios from "axios";
+import AvatarUpload from "../common/AvatarUpload";
+import Button from "../common/Button";
+
+// Styled Components
+const ProfileContainer = styled.div`
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+`;
+
+const ProfileLeft = styled.div`
+  display: none;
+  position: relative;
+  flex: 1;
+  background: linear-gradient(135deg, #e0f2fe 0%, #e8e0fe 100%);
+  width: 750px;
+  height: 100vh;
+
+  @media (min-width: 1024px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+`;
+
+const ProfileLeftOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.1) 0%,
+    rgba(79, 70, 229, 0.1) 100%
+  );
+`;
+
+const ProfileLeftContent = styled.div`
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 32rem;
+  padding: 2rem;
+`;
+
+const ProfileSlogan = styled.p`
+  font-size: 1.5rem;
+  color: #1e40af;
+  font-weight: 500;
+  margin-bottom: 2.5rem;
+  line-height: 1.75;
+  font-style: italic;
+`;
+
+const ProfileLogo = styled.img`
+  width: 25rem;
+  filter: drop-shadow(0 20px 13px rgba(0, 0, 0, 0.1));
+`;
+
+const ProfileLogoRight = styled.img`
+  width: 10rem;
+  filter: drop-shadow(0 20px 13px rgba(0, 0, 0, 0.1));
+  margin-bottom: 2rem;
+`;
+
+const ProfileRight = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  overflow-y: auto;
+  max-height: 100vh;
+`;
+
+const ProfileCard = styled.div`
+  width: 100%;
+  max-width: 48rem;
+  padding: 1.5rem;
+  background: white;
+  height: calc(100vh - 3rem);
+`;
+
+const ProfileHeading = styled.h1`
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: left;
+  margin-bottom: 2rem;
+  color: #1e3a8a;
+`;
+
+const ProfileButton = styled(Button)`
+  width: 100%;
+  margin-top: 1rem;
+  height: 48px !important;
+  border-radius: 50px !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+`;
+
+const StyledTabs = styled(Tabs)`
+  .ant-tabs-tab {
+    font-size: 16px;
+    font-weight: 500;
+    padding: 12px 16px;
+  }
+
+  .ant-tabs-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ant-tabs-ink-bar {
+    background: linear-gradient(to right, #2e59ff, #5145ff);
+  }
+
+  .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: #2e59ff;
+  }
+`;
+
+const TabContent = styled.div`
+  padding: 1rem 0;
+`;
+
+const FormContent = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const SectionTitle = styled.h3`
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const AlertMessage = styled.div`
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e6f7ff 100%);
+  border: 1px solid #91d5ff;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  color: #096dd9;
+  border-left: 4px solid #2e59ff;
+`;
+
+const UserInfoSection = styled.div`
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e2e8f0;
+`;
+
+const UserAvatarSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+`;
+
+const AvatarLabel = styled.div`
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 1rem;
+  text-align: center;
+`;
+
+export default function Profile() {
+  const [loading, setLoading] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [currentAvatar, setCurrentAvatar] = useState(null);
+  const [form] = Form.useForm();
+  const [passwordForm] = Form.useForm();
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  useEffect(() => {
+    form.setFieldsValue({
+      fullName: user.username,
+      email: user.email,
+    });
+
+    if (user.avatar && user.avatar.url) {
+      setCurrentAvatar(`http://localhost:1337${user.avatar.url}`);
+    } else {
+      setCurrentAvatar(null);
+    }
+  }, [user, form]);
+
+  const onFinish = async (values) => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        message.error("Vui lòng đăng nhập lại!");
+        return;
+      }
+
+      let avatarId = user.avatar;
+
+      // Upload avatar nếu có
+      if (avatarFile) {
+        const formData = new FormData();
+        formData.append("files", avatarFile);
+
+        const uploadRes = await axios.post(
+          "http://localhost:1337/api/upload",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (uploadRes.data && uploadRes.data[0]) {
+          avatarId = uploadRes.data[0].id;
+          setCurrentAvatar(URL.createObjectURL(avatarFile));
+        }
+      }
+
+      const updateData = {
+        username: values.fullName,
+      };
+
+      if (avatarFile) {
+        updateData.avatar = avatarId;
+      }
+
+      console.log("Sending update data:", updateData);
+      console.log("User ID:", user.id);
+      const response = await axios.put(
+        `http://localhost:1337/api/users/${user.id}`,
+        updateData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      // Cập nhật localStorage sau khi API thành công
+      const updatedUser = {
+        ...user,
+        username: values.fullName,
+      };
+
+      if (avatarFile) {
+        updatedUser.avatar = {
+          id: avatarId,
+          url: currentAvatar,
+        };
+      }
+
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
+      message.success("Cập nhật thông tin thành công!");
+      setAvatarFile(null);
+    } catch (err) {
+      console.error("Update error:", err);
+      console.error("Error response:", err.response?.data);
+
+      if (err.response?.status === 401) {
+        message.error("Token hết hạn! Vui lòng đăng nhập lại.");
+      } else if (err.response?.status === 403) {
+        message.error("Không có quyền cập nhật user!");
+      } else {
+        message.error(
+          `Cập nhật thất bại: ${
+            err.response?.data?.error?.message || err.message
+          }`
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Đổi mật khẩu
+  const onPasswordFinish = async (values) => {
+    setPasswordLoading(true);
+    try {
+      await axios.post(
+        "http://localhost:1337/api/auth/change-password",
+        {
+          currentPassword: values.currentPassword,
+          password: values.newPassword,
+          passwordConfirmation: values.confirmPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      message.success("Đổi mật khẩu thành công!");
+      passwordForm.resetFields();
+    } catch (err) {
+      console.error("Change password error:", err);
+      message.error(
+        err.response?.data?.error?.message || "Đổi mật khẩu thất bại!"
+      );
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
+  const handleAvatarChange = (file) => {
+    setAvatarFile(file);
+  };
+
+  return (
+    <ProfileContainer>
+      {/* LEFT Illustration */}
+      <ProfileLeft>
+        <ProfileLeftOverlay />
+        <ProfileLeftContent>
+          <ProfileSlogan>
+            "Một tổ chức có hiệu suất cao khi trao quyền cho đội ngũ để hiện
+            thực những mục tiêu khát vọng."
+          </ProfileSlogan>
+          <ProfileLogo src="/images/login2.png" alt="KWAY Logo" />
+        </ProfileLeftContent>
+      </ProfileLeft>
+
+      {/* RIGHT Form */}
+      <ProfileRight>
+        <ProfileCard>
+          <ProfileLogoRight src="/images/Logo-kways.png" alt="KWAY Logo" />
+          <ProfileHeading>Cập nhật thông tin</ProfileHeading>
+
+          <StyledTabs
+            defaultActiveKey="profile"
+            items={[
+              {
+                key: "profile",
+                label: (
+                  <span>
+                    <UserOutlined />
+                    Thông tin cá nhân
+                  </span>
+                ),
+                children: (
+                  <TabContent>
+                    <FormContent>
+                      <UserAvatarSection>
+                        <AvatarLabel>Avatar hiện tại</AvatarLabel>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            marginBottom: "1.5rem",
+                          }}
+                        >
+                          <AvatarUpload
+                            onAvatarChange={handleAvatarChange}
+                            initialImage={currentAvatar}
+                            showPreview={true}
+                          />
+                        </div>
+                      </UserAvatarSection>
+
+                      <Form
+                        form={form}
+                        name="profile"
+                        onFinish={onFinish}
+                        layout="vertical"
+                      >
+                        <UserInfoSection>
+                          <Form.Item
+                            name="fullName"
+                            label="Họ và tên"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhập họ và tên!",
+                              },
+                            ]}
+                          >
+                            <Input
+                              prefix={<UserOutlined />}
+                              placeholder="Nhập họ và tên"
+                              size="large"
+                            />
+                          </Form.Item>
+
+                          <Form.Item name="email" label="Email">
+                            <Input
+                              prefix={<UserOutlined />}
+                              disabled
+                              size="large"
+                            />
+                          </Form.Item>
+                        </UserInfoSection>
+
+                        <ProfileButton
+                          type="primary"
+                          htmlType="submit"
+                          loading={loading}
+                        >
+                          Cập nhật thông tin
+                        </ProfileButton>
+                      </Form>
+                    </FormContent>
+                  </TabContent>
+                ),
+              },
+              {
+                key: "password",
+                label: (
+                  <span>
+                    <LockOutlined />
+                    Đổi mật khẩu
+                  </span>
+                ),
+                children: (
+                  <TabContent>
+                    <FormContent>
+                      <AlertMessage>
+                        <SafetyOutlined /> Để bảo vệ tài khoản của bạn, vui lòng
+                        sử dụng mật khẩu mạnh và không chia sẻ với người khác.
+                      </AlertMessage>
+
+                      <Form
+                        form={passwordForm}
+                        name="password"
+                        onFinish={onPasswordFinish}
+                        layout="vertical"
+                      >
+                        <UserInfoSection>
+                          <SectionTitle>
+                            <LockOutlined />
+                            Thay đổi mật khẩu
+                          </SectionTitle>
+
+                          <Form.Item
+                            name="currentPassword"
+                            label="Mật khẩu hiện tại"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhập mật khẩu hiện tại!",
+                              },
+                            ]}
+                          >
+                            <Input.Password
+                              prefix={<LockOutlined />}
+                              placeholder="Nhập mật khẩu hiện tại"
+                              size="large"
+                              iconRender={(visible) =>
+                                visible ? (
+                                  <EyeInvisibleOutlined />
+                                ) : (
+                                  <EyeOutlined />
+                                )
+                              }
+                            />
+                          </Form.Item>
+
+                          <Form.Item
+                            name="newPassword"
+                            label="Mật khẩu mới"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhập mật khẩu mới!",
+                              },
+                              {
+                                min: 6,
+                                message: "Mật khẩu phải có ít nhất 6 ký tự!",
+                              },
+                            ]}
+                          >
+                            <Input.Password
+                              prefix={<LockOutlined />}
+                              placeholder="Nhập mật khẩu mới"
+                              size="large"
+                              iconRender={(visible) =>
+                                visible ? (
+                                  <EyeInvisibleOutlined />
+                                ) : (
+                                  <EyeOutlined />
+                                )
+                              }
+                            />
+                          </Form.Item>
+
+                          <Form.Item
+                            name="confirmPassword"
+                            label="Xác nhận mật khẩu mới"
+                            dependencies={["newPassword"]}
+                            rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng xác nhận mật khẩu mới!",
+                              },
+                              ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                  if (
+                                    !value ||
+                                    getFieldValue("newPassword") === value
+                                  ) {
+                                    return Promise.resolve();
+                                  }
+                                  return Promise.reject(
+                                    new Error("Mật khẩu xác nhận không khớp!")
+                                  );
+                                },
+                              }),
+                            ]}
+                          >
+                            <Input.Password
+                              prefix={<LockOutlined />}
+                              placeholder="Xác nhận mật khẩu mới"
+                              size="large"
+                              iconRender={(visible) =>
+                                visible ? (
+                                  <EyeInvisibleOutlined />
+                                ) : (
+                                  <EyeOutlined />
+                                )
+                              }
+                            />
+                          </Form.Item>
+                        </UserInfoSection>
+
+                        <ProfileButton
+                          type="primary"
+                          htmlType="submit"
+                          loading={passwordLoading}
+                        >
+                          Đổi mật khẩu
+                        </ProfileButton>
+                      </Form>
+                    </FormContent>
+                  </TabContent>
+                ),
+              },
+            ]}
+          />
+        </ProfileCard>
+      </ProfileRight>
+    </ProfileContainer>
+  );
+}
