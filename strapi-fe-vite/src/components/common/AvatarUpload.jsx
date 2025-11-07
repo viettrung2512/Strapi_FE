@@ -72,7 +72,7 @@ const AvatarUpload = ({ onAvatarChange }) => {
       >
         {imageUrl ? (
           <div className="avatar-preview">
-            <img src={imageUrl} alt="Avatar" style={{ width: '100%', height: '100%', borderRadius: '50%' }} />
+            <img src={imageUrl} alt="Avatar" style={{ width: '80%', height: '80%', borderRadius: '50%' }} />
           </div>
         ) : (
           <div className="upload-placeholder">
@@ -88,7 +88,6 @@ const AvatarUpload = ({ onAvatarChange }) => {
           className="remove-avatar"
           style={{ display: 'block', marginTop: '8px' }}
         >
-          Xóa ảnh
         </Button>
       )}
     </div>

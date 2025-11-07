@@ -5,6 +5,7 @@ import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Button from "../common/Button";
 import axios from "axios";
+import { API_URL } from "../../utils/constant";
 
 // Styled Components
 const ResetContainer = styled(Row)`
@@ -207,7 +208,7 @@ export default function ResetPassword() {
       console.log("🔄 Resetting password with token");
 
       const response = await axios.post(
-        "http://localhost:1337/api/auth/reset-password",
+        `${API_URL}/api/auth/reset-password`,
         {
           code: code,
           password: values.password,

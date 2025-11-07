@@ -24,7 +24,7 @@ export const register = async ({ username, email, password }) => {
 
 export const checkAuth = async () => {
   const token = localStorage.getItem("token");
-  const res = await fetch(`${API_URL}/users/me`, {
+  const res = await fetch(`${API_URL}/users/me?populate=*`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

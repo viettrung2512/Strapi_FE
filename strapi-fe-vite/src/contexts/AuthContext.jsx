@@ -1,12 +1,17 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { checkAuth, login as authLogin, register as authRegister, logout as authLogout } from '../utils/auth';
+import React, { createContext, useState, useContext, useEffect } from "react";
+import {
+  checkAuth,
+  login as authLogin,
+  register as authRegister,
+  logout as authLogout,
+} from "../utils/auth";
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -37,17 +42,14 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
-  // ✅ Login + lưu token
   const login = async (email, password) => {
     const res = await authLogin(email, password);
-    
+
     localStorage.setItem("token", res.jwt);
     setUser(res.user);
 
     return res.user;
   };
-
-  // ✅ Register + auto login
   const register = async (data) => {
     const res = await authRegister(data);
 
@@ -57,11 +59,16 @@ export const AuthProvider = ({ children }) => {
     return res.user;
   };
 
-  // ✅ Logout
   const logout = () => {
-    authLogout();
     localStorage.removeItem("token");
     setUser(null);
+  };
+  // ✅ Update user data
+  const updateUser = (updatedUserData) => {
+    setUser((prevUser) => ({
+      ...prevUser,
+      ...updatedUserData,
+    }));
   };
 
   return (
@@ -71,8 +78,9 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
+        updateUser,
         loading,
-        isAuthenticated: !!user
+        isAuthenticated: !!user,
       }}
     >
       {children}

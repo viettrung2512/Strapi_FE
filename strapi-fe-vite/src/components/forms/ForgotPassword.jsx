@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import Button from "../common/Button";
 import axios from "axios";
+import { API_URL } from "../../utils/constant";
 
 // Styled Components
 const ForgotContainer = styled.div`
@@ -116,7 +117,7 @@ export default function ForgotPassword() {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const url = "http://localhost:1337/api/auth/forgot-password";
+      const url = `${API_URL}/api/auth/forgot-password`;
 
       console.log("📨 Sending forgot-password:", values.email);
 

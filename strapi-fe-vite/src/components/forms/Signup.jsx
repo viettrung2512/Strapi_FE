@@ -12,7 +12,7 @@ import styled from "styled-components";
 import axios from "axios";
 import AvatarUpload from "../common/AvatarUpload";
 import Button from "../common/Button";
-
+import { API_URL } from "../../utils/constant";
 
 // Styled Components
 const SignupContainer = styled.div`
@@ -145,7 +145,7 @@ export default function Signup() {
     try {
       console.log("🚀 Starting registration process...");
       const res = await axios.post(
-        "http://localhost:1337/api/auth/local/register",
+        `${API_URL}/api/auth/local/register`,
         {
           username: values.fullName,
           email: values.email,
@@ -167,7 +167,7 @@ export default function Signup() {
           formData.append("field", "avatar");
 
           const uploadRes = await axios.post(
-            "http://localhost:1337/api/upload",
+            `${API_URL}/api/upload`,
             formData,
             {
               headers: {
@@ -181,7 +181,7 @@ export default function Signup() {
             const avatarId = uploadRes.data[0].id;
             console.log("✅ Avatar uploaded, ID:", avatarId);
             await axios.put(
-              `http://localhost:1337/api/users/${user.id}`,
+              `${API_URL}/api/users/${user.id}`,
               {
                 avatar: avatarId,
               },
@@ -200,7 +200,7 @@ export default function Signup() {
       }
 
       message.success("Đăng ký thành công!");
-      navigate("/dashboard");
+      window.location.href = "/";
     } catch (err) {
       console.error("❌ Registration error:", err);
       message.error(err.response?.data?.error?.message || "Đăng ký thất bại!");

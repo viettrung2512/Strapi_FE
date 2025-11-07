@@ -1,9 +1,12 @@
 import React from "react";
-import { Layout, Menu, Dropdown } from "antd";
+import { Layout, Menu, Dropdown, message } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 // import { Image } from "antd";
 const { Header } = Layout;
 import { Avatar, Space } from "antd";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { API_URL } from "../utils/constant";
 
 const appBarItems = [
   {
@@ -39,33 +42,7 @@ const appBarItems = [
     label: "Bảng giá",
   },
 ];
-const items = [
-  {
-    key: "1",
-    label: (
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://www.antgroup.com"
-      >
-        Thông tin tài khoản
-      </a>
-    ),
-  },
-  {
-    key: "2",
-    danger: true,
-    label: (
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://www.aliyun.com"
-      >
-        Đăng xuất
-      </a>
-    ),
-  },
-];
+
 const processedItems = appBarItems.map((item) => {
   if (item.children) {
     return {
@@ -82,6 +59,38 @@ const processedItems = appBarItems.map((item) => {
 });
 
 const AppBar = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    message.success("Đăng xuất thành công!");
+    navigate("/login");
+  };
+
+  const userMenuItems  = [
+    {
+      key: "1",
+      label: (
+        <div onClick={() => navigate("/profile")}>Thông tin tài khoản</div>
+      ),
+    },
+    {
+      key: "2",
+      danger: true,
+      label: <div onClick={handleLogout}>Đăng xuất</div>,
+    },
+  ];
+
+    const getAvatarUrl = () => {
+    if (!user?.avatar?.url) return null;
+    if (user.avatar.url.startsWith('http') || user.avatar.url.startsWith('blob:')) {
+      return user.avatar.url;
+    }
+    return `${API_URL}${user.avatar.url}`;
+  };
+
+
   return (
     <Layout>
       <Header
@@ -98,7 +107,7 @@ const AppBar = () => {
         }}
       >
         <img
-          src="/images/login2.png"
+          src="/images/Logo-kways.png"
           width="150"
           height="40"
           alt="Kimei"
@@ -117,13 +126,29 @@ const AppBar = () => {
             fontWeight: 500,
           }}
         />
-        <Dropdown menu={{ items }}>
-          <Avatar
-            size={40}
-            style={{
-              cursor: "pointer",
-            }}
-          />
+        <Dropdown
+          menu={{ items: userMenuItems }}
+          trigger={["click"]}
+          placement="bottomRight"
+        >
+          <div
+            style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+          >
+            <Avatar
+              size={40}
+              src={getAvatarUrl()}
+              style={{
+                ...(getAvatarUrl() ? {} : { backgroundColor: "#000000" }),
+                marginRight: "8px",
+              }}
+            >
+              {user?.username?.charAt(0)?.toUpperCase() || "U"}
+            </Avatar>
+            <span style={{ marginRight: "8px", fontWeight: 500 }}>
+              {user?.username || "User"}
+            </span>
+            <DownOutlined style={{ fontSize: "12px" }} />
+          </div>
         </Dropdown>
       </Header>
     </Layout>

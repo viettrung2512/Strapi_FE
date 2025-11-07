@@ -1,93 +1,45 @@
 import { useState, useEffect } from "react";
-import { Form, Input, message, Tabs, Card } from "antd";
+import { useNavigate } from "react-router-dom";
+import { Form, Input, message, Tabs, Card, Spin } from "antd"; // ✅ Thêm Spin
 import {
   UserOutlined,
   LockOutlined,
   SafetyOutlined,
   EyeOutlined,
   EyeInvisibleOutlined,
+  HomeOutlined,
 } from "@ant-design/icons";
 import styled from "styled-components";
 import axios from "axios";
 import AvatarUpload from "../common/AvatarUpload";
 import Button from "../common/Button";
+import { API_URL } from "../../utils/constant";
+import { useAuth } from "../../contexts/AuthContext";
+import AppBar from "../AppBar";
 
 // Styled Components
 const ProfileContainer = styled.div`
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding-top: 90px; /* Account for fixed AppBar */
+`;
+
+const ProfileWrapper = styled.div`
   display: flex;
-  height: 100vh;
-  overflow: hidden;
-`;
-
-const ProfileLeft = styled.div`
-  display: none;
-  position: relative;
-  flex: 1;
-  background: linear-gradient(135deg, #e0f2fe 0%, #e8e0fe 100%);
-  width: 750px;
-  height: 100vh;
-
-  @media (min-width: 1024px) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-`;
-
-const ProfileLeftOverlay = styled.div`
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(59, 130, 246, 0.1) 0%,
-    rgba(79, 70, 229, 0.1) 100%
-  );
-`;
-
-const ProfileLeftContent = styled.div`
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  max-width: 32rem;
-  padding: 2rem;
-`;
-
-const ProfileSlogan = styled.p`
-  font-size: 1.5rem;
-  color: #1e40af;
-  font-weight: 500;
-  margin-bottom: 2.5rem;
-  line-height: 1.75;
-  font-style: italic;
-`;
-
-const ProfileLogo = styled.img`
-  width: 25rem;
-  filter: drop-shadow(0 20px 13px rgba(0, 0, 0, 0.1));
-`;
-
-const ProfileLogoRight = styled.img`
-  width: 10rem;
-  filter: drop-shadow(0 20px 13px rgba(0, 0, 0, 0.1));
-  margin-bottom: 2rem;
-`;
-
-const ProfileRight = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: start;
   justify-content: center;
-  padding: 1.5rem 1rem;
-  overflow-y: auto;
-  max-height: 100vh;
+  align-items: flex-start;
+  min-height: calc(100vh - 90px);
+  padding: 2rem 1rem;
 `;
 
 const ProfileCard = styled.div`
   width: 100%;
   max-width: 48rem;
-  padding: 1.5rem;
+  padding: 2rem;
   background: white;
-  height: calc(100vh - 3rem);
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
 `;
 
 const ProfileHeading = styled.h1`
@@ -96,6 +48,16 @@ const ProfileHeading = styled.h1`
   text-align: left;
   margin-bottom: 2rem;
   color: #1e3a8a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const HomeButton = styled(Button)`
+  border-radius: 50px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  padding: 8px 16px !important;
 `;
 
 const ProfileButton = styled(Button)`
@@ -167,10 +129,11 @@ const UserInfoSection = styled.div`
 `;
 
 const UserAvatarSection = styled.div`
+  max-height: 10rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   padding: 1.5rem;
   background: #f8fafc;
   border-radius: 12px;
@@ -180,29 +143,40 @@ const UserAvatarSection = styled.div`
 const AvatarLabel = styled.div`
   font-size: 14px;
   color: #64748b;
-  margin-bottom: 1rem;
   text-align: center;
+  margin-top: -1rem;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
 `;
 
 export default function Profile() {
+  const navigate = useNavigate();
+  const { user, updateUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
   const [currentAvatar, setCurrentAvatar] = useState(null);
   const [form] = Form.useForm();
   const [passwordForm] = Form.useForm();
-  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    form.setFieldsValue({
-      fullName: user.username,
-      email: user.email,
-    });
+    // ✅ Kiểm tra user tồn tại trước khi set form values
+    if (user) {
+      form.setFieldsValue({
+        fullName: user.username || '',
+        email: user.email || '',
+      });
 
-    if (user.avatar && user.avatar.url) {
-      setCurrentAvatar(`http://localhost:1337${user.avatar.url}`);
-    } else {
-      setCurrentAvatar(null);
+      if (user.avatar && user.avatar.url) {
+        setCurrentAvatar(`${API_URL}${user.avatar.url}`);
+      } else {
+        setCurrentAvatar(null);
+      }
     }
   }, [user, form]);
 
@@ -216,7 +190,14 @@ export default function Profile() {
         return;
       }
 
-      let avatarId = user.avatar;
+      // ✅ Kiểm tra user tồn tại
+      if (!user || !user.id) {
+        message.error("Không tìm thấy thông tin người dùng!");
+        return;
+      }
+
+      let avatarId = user.avatar?.id;
+      let avatarUrl = user.avatar?.url;
 
       // Upload avatar nếu có
       if (avatarFile) {
@@ -224,7 +205,7 @@ export default function Profile() {
         formData.append("files", avatarFile);
 
         const uploadRes = await axios.post(
-          "http://localhost:1337/api/upload",
+          `${API_URL}/api/upload`,
           formData,
           {
             headers: {
@@ -236,7 +217,8 @@ export default function Profile() {
 
         if (uploadRes.data && uploadRes.data[0]) {
           avatarId = uploadRes.data[0].id;
-          setCurrentAvatar(URL.createObjectURL(avatarFile));
+          avatarUrl = uploadRes.data[0].url;
+          setCurrentAvatar(`${API_URL}${avatarUrl}`);
         }
       }
 
@@ -250,8 +232,9 @@ export default function Profile() {
 
       console.log("Sending update data:", updateData);
       console.log("User ID:", user.id);
+      
       const response = await axios.put(
-        `http://localhost:1337/api/users/${user.id}`,
+        `${API_URL}/api/users/${user.id}`,
         updateData,
         {
           headers: {
@@ -260,29 +243,29 @@ export default function Profile() {
           },
         }
       );
-      // Cập nhật localStorage sau khi API thành công
+
+      // ✅ Cập nhật AuthContext và localStorage
       const updatedUser = {
         ...user,
         username: values.fullName,
+        avatar: {
+          id: avatarId,
+          url: avatarUrl
+        }
       };
 
-      if (avatarFile) {
-        updatedUser.avatar = {
-          id: avatarId,
-          url: currentAvatar,
-        };
-      }
-
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+      updateUser(updatedUser);
 
       message.success("Cập nhật thông tin thành công!");
       setAvatarFile(null);
+      navigate("/");
     } catch (err) {
       console.error("Update error:", err);
       console.error("Error response:", err.response?.data);
 
       if (err.response?.status === 401) {
         message.error("Token hết hạn! Vui lòng đăng nhập lại.");
+        navigate("/login");
       } else if (err.response?.status === 403) {
         message.error("Không có quyền cập nhật user!");
       } else {
@@ -302,7 +285,7 @@ export default function Profile() {
     setPasswordLoading(true);
     try {
       await axios.post(
-        "http://localhost:1337/api/auth/change-password",
+        `${API_URL}/api/auth/change-password`, // ✅ Đã sửa template literal
         {
           currentPassword: values.currentPassword,
           password: values.newPassword,
@@ -317,6 +300,7 @@ export default function Profile() {
 
       message.success("Đổi mật khẩu thành công!");
       passwordForm.resetFields();
+      navigate("/");
     } catch (err) {
       console.error("Change password error:", err);
       message.error(
@@ -331,25 +315,31 @@ export default function Profile() {
     setAvatarFile(file);
   };
 
-  return (
-    <ProfileContainer>
-      {/* LEFT Illustration */}
-      <ProfileLeft>
-        <ProfileLeftOverlay />
-        <ProfileLeftContent>
-          <ProfileSlogan>
-            "Một tổ chức có hiệu suất cao khi trao quyền cho đội ngũ để hiện
-            thực những mục tiêu khát vọng."
-          </ProfileSlogan>
-          <ProfileLogo src="/images/login2.png" alt="KWAY Logo" />
-        </ProfileLeftContent>
-      </ProfileLeft>
+  // ✅ Hiển thị loading nếu user chưa được load
+  if (!user) {
+    return (
+      <LoadingContainer>
+        <Spin size="large" />
+      </LoadingContainer>
+    );
+  }
 
-      {/* RIGHT Form */}
-      <ProfileRight>
-        <ProfileCard>
-          <ProfileLogoRight src="/images/Logo-kways.png" alt="KWAY Logo" />
-          <ProfileHeading>Cập nhật thông tin</ProfileHeading>
+  return (
+    <>
+      <AppBar />
+      <ProfileContainer>
+        <ProfileWrapper>
+          <ProfileCard>
+            <ProfileHeading>
+              <span>Cập nhật thông tin</span>
+              <HomeButton
+                type="default"
+                icon={<HomeOutlined />}
+                onClick={() => navigate("/")}
+              >
+                Trang chủ
+              </HomeButton>
+            </ProfileHeading>
 
           <StyledTabs
             defaultActiveKey="profile"
@@ -560,8 +550,9 @@ export default function Profile() {
               },
             ]}
           />
-        </ProfileCard>
-      </ProfileRight>
-    </ProfileContainer>
+          </ProfileCard>
+        </ProfileWrapper>
+      </ProfileContainer>
+    </>
   );
 }

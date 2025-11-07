@@ -11,7 +11,7 @@ import { Form, Input, Checkbox, message } from "antd";
 import styled from "styled-components";
 import axios from "axios";
 import Button from "../common/Button";
-
+import { API_URL } from "../../utils/constant";
 
 // Styled Components
 const LoginContainer = styled.div`
@@ -24,8 +24,8 @@ const LoginLeft = styled.div`
   display: none;
   position: relative;
   flex: 1;
-  background: linear-gradient(135deg, #E0F2FE 0%, #E8E0FE 100%);
-  width: 750px;  
+  background: linear-gradient(135deg, #e0f2fe 0%, #e8e0fe 100%);
+  width: 750px;
   height: 954px;
 
   @media (min-width: 1024px) {
@@ -38,7 +38,11 @@ const LoginLeft = styled.div`
 const LoginLeftOverlay = styled.div`
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(79, 70, 229, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.1) 0%,
+    rgba(79, 70, 229, 0.1) 100%
+  );
 `;
 
 const LoginLeftContent = styled.div`
@@ -74,7 +78,7 @@ const LoginRight = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 7rem ;
+  padding: 7rem;
 `;
 
 const LoginCard = styled.div`
@@ -102,7 +106,7 @@ const LoginLink = styled(Link)`
   color: #2e59ff;
   font-weight: 500;
   text-decoration: none;
-  
+
   &:hover {
     opacity: 0.8;
   }
@@ -131,26 +135,25 @@ const LoginCopy = styled.p`
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
   const navigate = useNavigate();
-
+  const { login } = useAuth();
   const onFinish = async (values) => {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:1337/api/auth/local", {
+      const res = await axios.post(`${API_URL}/api/auth/local`, {
         identifier: values.email,
         password: values.password,
       });
 
       const { jwt, user } = res.data;
 
-      // Lưu token
+      // Lưu token, email, username
       localStorage.setItem("token", jwt);
       localStorage.setItem("user", JSON.stringify(user));
 
       message.success("Đăng nhập thành công!");
-      navigate("/");
+      window.location.href = "/";
     } catch (err) {
       console.log(err);
       message.error(
@@ -171,10 +174,7 @@ export default function Login() {
             "Một tổ chức có hiệu suất cao khi trao quyền cho đội ngũ để hiện
             thực những mục tiêu khát vọng."
           </LoginSlogan>
-          <LoginLogo
-            src="/images/login2.png"
-            alt="KWAY Logo"
-          />
+          <LoginLogo src="/images/login2.png" alt="KWAY Logo" />
         </LoginLeftContent>
       </LoginLeft>
 
@@ -222,9 +222,7 @@ export default function Login() {
                 <Checkbox>Ghi nhớ</Checkbox>
               </Form.Item>
 
-              <LoginLink to="/forgot-password">
-                Quên mật khẩu?
-              </LoginLink>
+              <LoginLink to="/forgot-password">Quên mật khẩu?</LoginLink>
             </LoginFlexBetween>
 
             <LoginButton
@@ -238,10 +236,7 @@ export default function Login() {
           </Form>
 
           <LoginFooterText>
-            Chưa có tài khoản?{" "}
-            <LoginLink to="/signup">
-              Đăng ký
-            </LoginLink>
+            Chưa có tài khoản? <LoginLink to="/signup">Đăng ký</LoginLink>
           </LoginFooterText>
 
           <LoginCopy>© 2025 KWAY. Tất cả quyền được bảo lưu.</LoginCopy>
