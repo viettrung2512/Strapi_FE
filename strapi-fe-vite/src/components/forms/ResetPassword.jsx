@@ -71,7 +71,7 @@ const ResetRight = styled(Col)`
 const ResetCard = styled.div`
   align-items: center;
   width: 100%;
-  max-width: 32rem;
+  max-width: 50rem;
   padding: 2.5rem;
   background: white;
 
@@ -111,53 +111,6 @@ const ResetLink = styled(Link)`
   }
 `;
 
-const AlertContainer = styled.div`
-  margin-bottom: 1.5rem;
-  text-align: start;
-`;
-
-const PasswordStrength = styled.div`
-  margin-top: 0.5rem;
-  text-align: start;
-`;
-
-const StrengthBar = styled.div`
-  height: 4px;
-  border-radius: 2px;
-  margin-top: 0.25rem;
-  transition: all 0.3s ease;
-  width: ${(props) => {
-    switch (props.strength) {
-      case 1:
-        return "33%";
-      case 2:
-        return "66%";
-      case 3:
-        return "100%";
-      default:
-        return "0%";
-    }
-  }};
-  background: ${(props) => {
-    switch (props.strength) {
-      case 1:
-        return "#ff4d4f";
-      case 2:
-        return "#faad14";
-      case 3:
-        return "#52c41a";
-      default:
-        return "#f0f0f0";
-    }
-  }};
-`;
-
-const StrengthText = styled.div`
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-  color: #666;
-`;
-
 export default function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
@@ -194,6 +147,14 @@ export default function ResetPassword() {
       return Promise.reject(new Error("Mật khẩu phải có ít nhất 6 ký tự!"));
     }
 
+    return Promise.resolve();
+  };
+
+  const validatePasswordNotSame = async (_, value) => {
+    const currentPassword = form.getFieldValue("currentPassword");
+    if (value && currentPassword && value === currentPassword) {
+      return Promise.reject(new Error("Mật khẩu mới không được trùng với mật khẩu hiện tại!"));
+    }
     return Promise.resolve();
   };
 
@@ -317,16 +278,7 @@ export default function ResetPassword() {
             <Form.Item
               name="password"
               label="Mật khẩu mới"
-              rules={[{ validator: validateNewPassword }]}
-              extra={
-                passwordStrength > 0 && (
-                  <PasswordStrength>
-                    <div>Độ mạnh mật khẩu:</div>
-                    <StrengthBar strength={passwordStrength} />
-                    <StrengthText>{strengthText}</StrengthText>
-                  </PasswordStrength>
-                )
-              }
+              rules={[{ validator: validateNewPassword }, { validator: validatePasswordNotSame }]}
             >
               <Input.Password
                 prefix={<LockOutlined />}

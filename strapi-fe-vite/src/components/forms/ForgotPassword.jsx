@@ -18,8 +18,8 @@ const ForgotLeft = styled.div`
   display: none;
   position: relative;
   flex: 1;
-  background: linear-gradient(135deg, #E0F2FE 0%, #E8E0FE 100%);
-  width: 750px;  
+  background: linear-gradient(135deg, #e0f2fe 0%, #e8e0fe 100%);
+  width: 750px;
   height: 954px;
 
   @media (min-width: 1024px) {
@@ -32,7 +32,11 @@ const ForgotLeft = styled.div`
 const ForgotLeftOverlay = styled.div`
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(79, 70, 229, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.1) 0%,
+    rgba(79, 70, 229, 0.1) 100%
+  );
 `;
 
 const ForgotLeftContent = styled.div`
@@ -63,13 +67,12 @@ const ForgotLogoRight = styled.img`
   margin-bottom: 2rem;
 `;
 
-
 const ForgotRight = styled.div`
   flex: 1;
   display: flex;
   align-items: start;
   justify-content: center;
-  padding: 7rem ;
+  padding: 7rem;
 `;
 
 const ForgotCard = styled.div`
@@ -113,7 +116,6 @@ const ForgotLink = styled(Link)`
 export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-
   const onFinish = async (values) => {
     setLoading(true);
     try {
@@ -130,21 +132,10 @@ export default function ForgotPassword() {
           },
         }
       );
-
-      console.log("✅ Forgot password response:", res.data);
-      console.log("📧 Email should be sent to:", values.email);
-
       message.success("Vui lòng kiểm tra email để đặt lại mật khẩu!");
       form.resetFields();
     } catch (error) {
-      console.error("❌ Forgot password error:", error);
-      console.error("❌ Error response:", error.response?.data);
-      console.error("❌ Error status:", error.response?.status);
-
-      message.error(
-        error.response?.data?.error?.message ||
-          "Không thể gửi email. Kiểm tra cấu hình Strapi."
-      );
+      message.error("Không gửi được email. Vui lòng thử lại!");
     } finally {
       setLoading(false);
     }
@@ -153,7 +144,7 @@ export default function ForgotPassword() {
   return (
     <ForgotContainer>
       {/* LEFT Illustration */}
-      <ForgotLeft xs = {0} lg ={12}>
+      <ForgotLeft xs={0} lg={12}>
         <ForgotLeftOverlay />
         <ForgotLeftContent>
           <ForgotSlogan>

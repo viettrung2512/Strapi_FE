@@ -33,13 +33,17 @@ const ProfileWrapper = styled.div`
 `;
 
 const ProfileCard = styled.div`
-  width: 100%;
-  max-width: 48rem;
+  width: 48rem;
   padding: 2rem;
   background: white;
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
+
+  @media (max-width: 750px) {
+    width: 100%;
+    max-width: 48rem;
+  }
 `;
 
 const ProfileHeading = styled.h1`
@@ -62,7 +66,6 @@ const HomeButton = styled(Button)`
 
 const ProfileButton = styled(Button)`
   width: 100%;
-  margin-top: 1rem;
   height: 48px !important;
   border-radius: 50px !important;
   font-size: 16px !important;
@@ -92,7 +95,8 @@ const StyledTabs = styled(Tabs)`
 `;
 
 const TabContent = styled.div`
-  padding: 1rem 0;
+  height: 520px;
+  overflow-y: auto;
 `;
 
 const FormContent = styled.div`
@@ -104,7 +108,7 @@ const SectionTitle = styled.h3`
   font-size: 1.25rem;
   font-weight: 600;
   color: #1e3a8a;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -115,7 +119,7 @@ const AlertMessage = styled.div`
   background: linear-gradient(135deg, #f0f7ff 0%, #e6f7ff 100%);
   border: 1px solid #91d5ff;
   border-radius: 8px;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   color: #096dd9;
   border-left: 4px solid #2e59ff;
 `;
@@ -468,7 +472,6 @@ export default function Profile() {
                               }
                             />
                           </Form.Item>
-
                           <Form.Item
                             name="newPassword"
                             label="Mật khẩu mới"
@@ -481,6 +484,16 @@ export default function Profile() {
                                 min: 6,
                                 message: "Mật khẩu phải có ít nhất 6 ký tự!",
                               },
+                              ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                  if (!value || getFieldValue("currentPassword") !== value) {
+                                    return Promise.resolve();
+                                  }
+                                  return Promise.reject(
+                                    new Error("Mật khẩu mới không được trùng với mật khẩu hiện tại!")
+                                  );
+                                },
+                              }),
                             ]}
                           >
                             <Input.Password
