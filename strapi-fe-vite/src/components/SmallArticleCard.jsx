@@ -5,6 +5,7 @@ import { Tag, Flex, Spin } from "antd";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import { API_URL } from "../utils/constant";
+import { Link } from "react-router-dom";
 
 const SmallArticleCard = ({ article }) => {
   if (!article) {
@@ -34,81 +35,83 @@ const SmallArticleCard = ({ article }) => {
   });
   return (
     <div>
-      <Card
-        hoverable
-        styles={{ body: { padding: "16px", height: "100%" } }}
-        style={{
-          borderRadius: "16px",
-          background: "white",
-          height: "160px",
-          minWidth: "480px",
-          width: "100%",
-        }}
-      >
-        <Flex
-          gap="small"
-          align="center"
-          justify="center"
-          style={{ height: "100%" }}
+      <Link to={`/article/${article.documentId}`}>
+        <Card
+          hoverable
+          styles={{ body: { padding: "16px", height: "100%" } }}
+          style={{
+            borderRadius: "16px",
+            background: "white",
+            height: "160px",
+            minWidth: "480px",
+            width: "100%",
+          }}
         >
-          <div>
-            <img
-              width={140}
-              height={103}
-              src={imgUrl}
-              alt="ArticleImage"
-              style={{
-                borderRadius: "16px",
-                objectFit: "cover",
-              }}
-              loading="lazy"
-            />
-          </div>
-          <div>
-            {article.categories.map((tag) => (
-              <Tag
+          <Flex
+            gap="small"
+            align="center"
+            justify="center"
+            style={{ height: "100%" }}
+          >
+            <div>
+              <img
+                width={140}
+                height={103}
+                src={imgUrl}
+                alt="ArticleImage"
+                style={{
+                  borderRadius: "16px",
+                  objectFit: "cover",
+                }}
+                loading="lazy"
+              />
+            </div>
+            <div>
+              {article.categories.map((tag) => (
+                <Tag
+                  style={{
+                    fontSize: "14px",
+                    fontFamily: "Inter, sans-serif",
+                    padding: "4px 10px",
+                    margin: "16px 8px 16px 0",
+                    borderRadius: "8px",
+                  }}
+                  bordered={false}
+                  color={tag.color}
+                  key={tag.id}
+                >
+                  {tag.name
+                    ? tag.name.charAt(0).toUpperCase() + tag.name.slice(1)
+                    : ""}
+                </Tag>
+              ))}
+              <h4
+                style={{
+                  fontSize: "16px",
+                  fontWeight: "500",
+                  lineHeight: "24px",
+                  fontFamily: "Inter, sans-serif",
+                  marginBottom: "8px",
+                  Color: "#232D3A",
+                }}
+              >
+                {article.title}
+              </h4>
+
+              <div
                 style={{
                   fontSize: "14px",
                   fontFamily: "Inter, sans-serif",
-                  padding: "4px 10px",
-                  margin: "16px 8px 16px 0",
-                  borderRadius: "8px",
+                  color: "gray",
+                  Color: "#232D3A",
                 }}
-                bordered={false}
-                color={tag.color}
-                key={tag.id}
               >
-                {tag.name
-                  ? tag.name.charAt(0).toUpperCase() + tag.name.slice(1)
-                  : ""}
-              </Tag>
-            ))}
-            <h4
-              style={{
-                fontSize: "16px",
-                fontWeight: "500",
-                lineHeight: "24px",
-                fontFamily: "Inter, sans-serif",
-                marginBottom: "8px",
-                Color: "#232D3A",
-              }}
-            >
-              {article.title}
-            </h4>
-
-            <div
-              style={{
-                fontSize: "14px",
-                fontFamily: "Inter, sans-serif",
-                color: "gray",
-                Color: "#232D3A",
-              }}
-            >
-              {timeAgo}
+                {timeAgo}
+              </div>
             </div>
-          </div>
-        </Flex>
-      </Card>
+          </Flex>
+        </Card>
+      </Link>
     </div>
   );
 };

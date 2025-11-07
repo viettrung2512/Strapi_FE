@@ -3,11 +3,12 @@ import {
   checkAuth,
   login as authLogin,
   register as authRegister,
-  logout as authLogout,
+  // logout as authLogout,
 } from "../utils/auth";
 
 const AuthContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -33,7 +34,7 @@ export const AuthProvider = ({ children }) => {
         setUser(userData);
       } catch (error) {
         localStorage.removeItem("token");
-        console.log("Token invalid");
+        console.log("Token invalid", error);
       } finally {
         setLoading(false);
       }

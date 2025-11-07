@@ -118,8 +118,8 @@ export default function ResetPassword() {
   const navigate = useNavigate();
   const [code, setCode] = useState("");
   const [isValidCode, setIsValidCode] = useState(true);
-  const [passwordStrength, setPasswordStrength] = useState(0);
-  const [strengthText, setStrengthText] = useState("");
+  // const [passwordStrength, setPasswordStrength] = useState(0);
+  // const [strengthText, setStrengthText] = useState("");
 
   useEffect(() => {
     const token = searchParams.get("code");
@@ -132,11 +132,11 @@ export default function ResetPassword() {
     }
   }, [searchParams]);
 
-  const handlePasswordChange = (e) => {
-    const password = e.target.value;
-    setPasswordStrength(strength.level);
-    setStrengthText(strength.text);
-  };
+  // const handlePasswordChange = (e) => {
+  //   const password = e.target.value;
+  //   setPasswordStrength(strength.level);
+  //   setStrengthText(strength.text);
+  // };
 
   const validateNewPassword = async (_, value) => {
     if (!value) {
@@ -284,7 +284,7 @@ export default function ResetPassword() {
                 prefix={<LockOutlined />}
                 placeholder="Nhập mật khẩu mới"
                 size="large"
-                onChange={handlePasswordChange}
+                // onChange={handlePasswordChange}
               />
             </Form.Item>
 

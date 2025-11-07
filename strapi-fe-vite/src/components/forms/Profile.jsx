@@ -237,7 +237,7 @@ export default function Profile() {
       console.log("Sending update data:", updateData);
       console.log("User ID:", user.id);
       
-      const response = await axios.put(
+      await axios.put(
         `${API_URL}/api/users/${user.id}`,
         updateData,
         {

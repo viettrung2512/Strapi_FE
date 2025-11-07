@@ -123,7 +123,7 @@ export default function ForgotPassword() {
 
       console.log("📨 Sending forgot-password:", values.email);
 
-      const res = await axios.post(
+      await axios.post(
         url,
         { email: values.email },
         {
@@ -135,7 +135,7 @@ export default function ForgotPassword() {
       message.success("Vui lòng kiểm tra email để đặt lại mật khẩu!");
       form.resetFields();
     } catch (error) {
-      message.error("Không gửi được email. Vui lòng thử lại!");
+      message.error("Không gửi được email. Vui lòng thử lại!", error);
     } finally {
       setLoading(false);
     }

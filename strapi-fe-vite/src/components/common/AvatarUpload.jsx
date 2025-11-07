@@ -1,12 +1,13 @@
 import  { useState } from 'react';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Upload, message } from 'antd';
-import { useAuth } from '../../contexts/AuthContext';
+// import { useAuth } from '../../contexts/AuthContext';
 
 const AvatarUpload = ({ onAvatarChange }) => {
-  const { logout } = useAuth();
+  // const { logout } = useAuth();
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
+  // eslint-disable-next-line no-unused-vars
   const [selectedFile, setSelectedFile] = useState(null);
 
   const getBase64 = (file) => {

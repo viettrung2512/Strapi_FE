@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   EyeOutlined,
   EyeInvisibleOutlined,
@@ -135,8 +134,8 @@ const LoginCopy = styled.p`
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { login } = useAuth();
+  // const navigate = useNavigate();
+  // const { login } = useAuth();
   const onFinish = async (values) => {
     setLoading(true);
 

@@ -12,6 +12,7 @@ import ForgotPassword from "./components/forms/ForgotPassword";
 import ResetPassword from "./components/forms/ResetPassword";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 
+import ArticleDetail from "./pages/ArticleDetail";
 function App() {
   return (
     <AuthProvider>
@@ -26,6 +27,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            {/* <Route path="/" element={<Home />} /> */}
+            <Route path="/article/:articleId" element={<ArticleDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route
@@ -38,6 +41,8 @@ function App() {
             />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="*" element={<Home />} />
+
           </Routes>
         </div>
       </Router>

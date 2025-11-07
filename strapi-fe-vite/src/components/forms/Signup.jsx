@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+// import { useAuth } from "../../contexts/AuthContext";
+import { Link } from "react-router-dom";
 import {
   EyeOutlined,
   EyeInvisibleOutlined,
@@ -25,7 +25,7 @@ const SignupLeft = styled.div`
   display: none;
   position: relative;
   flex: 1;
-  background: linear-gradient(135deg, #E0F2FE 0%, #E8E0FE 100%);
+  background: linear-gradient(135deg, #e0f2fe 0%, #e8e0fe 100%);
 
   @media (min-width: 1024px) {
     display: flex;
@@ -37,7 +37,11 @@ const SignupLeft = styled.div`
 const SignupLeftOverlay = styled.div`
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(79, 70, 229, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.1) 0%,
+    rgba(79, 70, 229, 0.1) 100%
+  );
 `;
 
 const SignupLeftContent = styled.div`
@@ -73,7 +77,7 @@ const SignupRight = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 7rem ;
+  padding: 7rem;
 `;
 
 const SignupCard = styled.div`
@@ -108,7 +112,7 @@ const SignupFooterText = styled.p`
 const SignupLink = styled(Link)`
   color: #3b82f6;
   text-decoration: none;
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -137,8 +141,8 @@ const UploadOptional = styled.span`
 export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
-  const { register } = useAuth();
-  const navigate = useNavigate();
+  // const { register } = useAuth();
+  // const navigate = useNavigate();
 
   const onFinish = async (values) => {
     setLoading(true);
@@ -223,10 +227,7 @@ export default function Signup() {
             "Một tổ chức có hiệu suất cao khi trao quyền cho đội ngũ để hiện
             thực những mục tiêu khát vọng."
           </SignupSlogan>
-          <SignupLogo
-            src="/images/login2.png"
-            alt="KWAY Logo"
-          />
+          <SignupLogo src="/images/login2.png" alt="KWAY Logo" />
         </SignupLeftContent>
       </SignupLeft>
 
@@ -310,10 +311,7 @@ export default function Signup() {
           </Form>
 
           <SignupFooterText>
-            Đã có tài khoản?{" "}
-            <SignupLink to="/login">
-              Đăng nhập
-            </SignupLink>
+            Đã có tài khoản? <SignupLink to="/login">Đăng nhập</SignupLink>
           </SignupFooterText>
 
           <SignupCopy>© 2025 KIMEI. Tất cả quyền được bảo lưu.</SignupCopy>

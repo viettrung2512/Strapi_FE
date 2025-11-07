@@ -65,7 +65,7 @@ const NewArticles = () => {
           gutter={[16, { xs: 8, sm: 16, md: 24, lg: 32 }]}
         >
           {newArticles.map((article) => (
-            <Col xs={24} md={12}>
+            <Col xs={24} md={12} key={article.id}>
               <SmallArticleCard article={article}></SmallArticleCard>
             </Col>
           ))}
