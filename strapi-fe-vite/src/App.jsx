@@ -1,8 +1,4 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import Home from "./pages/Home";
 import Login from "./components/forms/Login";
@@ -28,7 +24,14 @@ function App() {
               }
             />
             {/* <Route path="/" element={<Home />} /> */}
-            <Route path="/article/:articleId" element={<ArticleDetail />} />
+            <Route
+              path="/article/:articleId"
+              element={
+                <ProtectedRoute>
+                  <ArticleDetail />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route
@@ -42,7 +45,6 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<Home />} />
-
           </Routes>
         </div>
       </Router>

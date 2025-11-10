@@ -9,22 +9,26 @@ import { API_URL } from "../../utils/constant";
 
 // Styled Components
 const ResetContainer = styled(Row)`
-  min-height: 100vh;
-  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden; 
 `;
 
 const ResetLeft = styled(Col)`
-  background: linear-gradient(135deg, #E0F2FE 0%, #E8E0FE 100%);
+  background: linear-gradient(135deg, #e0f2fe 0%, #e8e0fe 100%);
   position: relative;
   display: none;
-  flex: 1;
+  height: 100%;
   width: 750px;
   height: 954px;
+  overflow: hidden;
 
   @media (min-width: 1024px) {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex: 1;
   }
 `;
 
@@ -57,27 +61,26 @@ const ResetSlogan = styled.p`
 
 const ResetLogo = styled.img`
   width: 25rem;
+  max-width: 100%;
+  height: auto;
   filter: drop-shadow(0 20px 13px rgba(0, 0, 0, 0.1));
 `;
 
 const ResetRight = styled(Col)`
   flex: 1;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 7rem ;
+  justify-content: center; 
+  align-items: center; 
+  padding: 7rem;
+  height: 100%;
+  overflow: hidden; 
 `;
 
 const ResetCard = styled.div`
-  align-items: center;
   width: 100%;
-  max-width: 50rem;
-  padding: 2.5rem;
+  max-width: 80rem;
   background: white;
-
-  @media (max-width: 992px) {
-    padding: 2rem;
-  }
+  padding: 10rem;
 `;
 
 const ResetHeading = styled.h1`
@@ -153,7 +156,9 @@ export default function ResetPassword() {
   const validatePasswordNotSame = async (_, value) => {
     const currentPassword = form.getFieldValue("currentPassword");
     if (value && currentPassword && value === currentPassword) {
-      return Promise.reject(new Error("Mật khẩu mới không được trùng với mật khẩu hiện tại!"));
+      return Promise.reject(
+        new Error("Mật khẩu mới không được trùng với mật khẩu hiện tại!")
+      );
     }
     return Promise.resolve();
   };
@@ -278,7 +283,10 @@ export default function ResetPassword() {
             <Form.Item
               name="password"
               label="Mật khẩu mới"
-              rules={[{ validator: validateNewPassword }, { validator: validatePasswordNotSame }]}
+              rules={[
+                { validator: validateNewPassword },
+                { validator: validatePasswordNotSame },
+              ]}
             >
               <Input.Password
                 prefix={<LockOutlined />}

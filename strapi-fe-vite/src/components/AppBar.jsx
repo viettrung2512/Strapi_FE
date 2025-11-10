@@ -112,6 +112,7 @@ const AppBar = () => {
           height="40"
           alt="Kimei"
           style={{ marginRight: "24px", display: "block", cursor: "pointer" }}
+          onClick={() => navigate("/")}
         />
         <Menu
           theme="light"

@@ -62,7 +62,7 @@ const NewArticles = () => {
         </h2>
         <Row
           justify="flex-start"
-          gutter={[16, { xs: 8, sm: 16, md: 24, lg: 32 }]}
+          gutter={[32, { xs: 8, sm: 16, md: 24, lg: 32 }]}
         >
           {newArticles.map((article) => (
             <Col xs={24} md={12} key={article.id}>

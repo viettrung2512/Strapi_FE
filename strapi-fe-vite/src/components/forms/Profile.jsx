@@ -39,7 +39,7 @@ const ProfileCard = styled.div`
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
-
+  
   @media (max-width: 750px) {
     width: 100%;
     max-width: 48rem;
