@@ -129,7 +129,7 @@ const ContactModal = ({ visible, onClose }) => {
       footer={null}
       width="90%"
       style={{ maxWidth: "1200px" }}
-      bodyStyle={{ padding: 0, height: "80vh" }}
+      styles={{ body:{padding: 0, height: "80vh"} }}
       centered
     >
       <Card>
@@ -205,9 +205,6 @@ const ContactModal = ({ visible, onClose }) => {
                 display: "grid",
                 gridTemplateColumns: "1fr",
                 gap: "16px",
-                "@media (min-width: 768px)": {
-                  gridTemplateColumns: "1fr 1fr",
-                },
               }}
             >
               <Form.Item

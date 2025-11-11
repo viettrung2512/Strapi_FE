@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect, useCallback } from "react";
 import {
   Layout,
   List,
-  Avatar,
   Tag,
   Typography,
   Spin,
@@ -10,18 +9,10 @@ import {
   Button,
   Card,
 } from "antd";
-import { UserOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, ReloadOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { API_URL } from "../utils/constant";
 import AppBar from "../components/AppBar";
-
-const getAvatarUrl = (avatar) => {
-  if (!avatar?.url) return null;
-  if (avatar.url.startsWith("http") || avatar.url.startsWith("blob:")) {
-    return avatar.url;
-  }
-  return `${API_URL}${avatar.url}`;
-};
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -35,29 +26,31 @@ const Questions = () => {
     fetchQuestions();
   }, []);
 
-const fetchQuestions = async () => {
-  setLoading(true);
-  try {
-    const token = localStorage.getItem("token");
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!token) {
-      message.warning("Bạn cần đăng nhập để xem câu hỏi của mình");
-      return;
+  const fetchQuestions = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!token || !user) {
+        message.warning("Bạn cần đăng nhập để xem câu hỏi của mình");
+        return;
+      }
+
+      const res = await axios.get(
+        `${API_URL}/api/questions?filters[user][$eq]=${user.id}&populate=*`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setQuestions(res.data.data || []);
+    } catch (err) {
+      console.error("Error fetching questions:", err);
+      message.error("Không thể tải câu hỏi");
+    } finally {
+      setLoading(false);
     }
-
-    const res = await axios.get(`${API_URL}/api/questions?filters[user][$eq]=${user.id}&populate=*`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    setQuestions(res.data.data || []);
-  } catch (err) {
-    console.error("Error fetching questions:", err);
-    message.error("Không thể tải câu hỏi");
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   const formatDate = (dateStr) =>
     new Date(dateStr).toLocaleString("vi-VN", { hour12: false });
@@ -119,12 +112,7 @@ const fetchQuestions = async () => {
                     marginBottom: 12,
                   }}
                 >
-                  <Avatar
-                    src={getAvatarUrl(selected.user?.avatar)}
-                    icon={<UserOutlined />}
-                    size={40}
-                  />
-                  <div style={{ marginLeft: 12 }}>
+                  <div >
                     <Text strong style={{ fontSize: 15 }}>
                       {selected.name}
                     </Text>
@@ -179,12 +167,7 @@ const fetchQuestions = async () => {
                       marginBottom: 12,
                     }}
                   >
-                    <Avatar
-                      style={{ backgroundColor: "#1890ff" }}
-                      icon={<UserOutlined />}
-                      size={40}
-                    />
-                    <div style={{ marginLeft: 12 }}>
+                    <div>
                       <Text strong style={{ fontSize: 15 }}>
                         Kways - Kimei Global
                       </Text>
@@ -215,7 +198,7 @@ const fetchQuestions = async () => {
               )}
             </div>
           ) : (
-            // 🔹 Danh sách câu hỏi (Inbox view)
+            // Danh sách câu hỏi (Inbox view)
             <div>
               <div
                 style={{
@@ -252,12 +235,6 @@ const fetchQuestions = async () => {
                     }
                   >
                     <List.Item.Meta
-                      avatar={
-                        <Avatar
-                          src={getAvatarUrl(item.user?.avatar)}
-                          icon={<UserOutlined />}
-                        />
-                      }
                       title={
                         <div
                           style={{
@@ -307,8 +284,6 @@ const fetchQuestions = async () => {
           )}
         </Content>
       </Layout>
-
-
     </>
   );
 };
