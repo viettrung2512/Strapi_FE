@@ -2,6 +2,7 @@ import AppBar from "../components/AppBar";
 import FeaturedArticles from "../components/FeaturedArticles";
 import NewArticles from "../components/NewArticles";
 import TopArticles from "../components/TopArticles";
+import FloatingButton from "../components/FloatingButton";
 function Home() {
   return (
     <main
@@ -15,6 +16,7 @@ function Home() {
       <TopArticles></TopArticles>
       <FeaturedArticles></FeaturedArticles>
       <NewArticles></NewArticles>
+      <FloatingButton />
     </main>
   );
 }

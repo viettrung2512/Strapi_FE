@@ -68,7 +68,7 @@ const AppBar = () => {
     navigate("/login");
   };
 
-  const userMenuItems  = [
+  const userMenuItems = [
     {
       key: "1",
       label: (
@@ -77,19 +77,25 @@ const AppBar = () => {
     },
     {
       key: "2",
+      label: <div onClick={() => navigate("/questions")}>Quản lý câu hỏi</div>,
+    },
+    {
+      key: "3",
       danger: true,
       label: <div onClick={handleLogout}>Đăng xuất</div>,
     },
   ];
 
-    const getAvatarUrl = () => {
+  const getAvatarUrl = () => {
     if (!user?.avatar?.url) return null;
-    if (user.avatar.url.startsWith('http') || user.avatar.url.startsWith('blob:')) {
+    if (
+      user.avatar.url.startsWith("http") ||
+      user.avatar.url.startsWith("blob:")
+    ) {
       return user.avatar.url;
     }
     return `${API_URL}${user.avatar.url}`;
   };
-
 
   return (
     <Layout>
