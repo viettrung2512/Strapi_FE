@@ -75,19 +75,11 @@ const ContactModal = ({ visible, onClose }) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (visible) {
-      // Hide scrollbar when modal is open
-      document.body.style.overflow = "hidden";
-    } else {
-      // Restore scrollbar when modal is closed
-      document.body.style.overflow = "auto";
-    }
-
     // Cleanup on unmount
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [visible]);
+  }, []);
 
   const handleSubmit = async (values) => {
     const token = localStorage.getItem("token");
@@ -101,7 +93,6 @@ const ContactModal = ({ visible, onClose }) => {
             email: values.email,
             phoneNumber: values.phone,
             message: values.message,
-            reqStatus: "Đang xử lý",
             user: user.id,
           },
         },

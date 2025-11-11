@@ -14,7 +14,6 @@ import { UserOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { API_URL } from "../utils/constant";
 import AppBar from "../components/AppBar";
-import FloatingButton from "../components/FloatingButton";
 
 const getAvatarUrl = (avatar) => {
   if (!avatar?.url) return null;
@@ -40,12 +39,13 @@ const fetchQuestions = async () => {
   setLoading(true);
   try {
     const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user"));
     if (!token) {
       message.warning("Bạn cần đăng nhập để xem câu hỏi của mình");
       return;
     }
 
-    const res = await axios.get(`${API_URL}/api/questions?populate=*`, {
+    const res = await axios.get(`${API_URL}/api/questions?filters[user][$eq]=${user.id}&populate=*`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -308,7 +308,7 @@ const fetchQuestions = async () => {
         </Content>
       </Layout>
 
-      <FloatingButton tooltip="Đi đến trang Liên hệ" />
+
     </>
   );
 };
