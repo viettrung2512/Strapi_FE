@@ -8,54 +8,6 @@ const PAGE_SIZE = 3;
 const RelatedArticles = () => {
   const [relatedArticles, setRelatedArticles] = useState([]);
   const { articleId } = useParams();
-  //   const fetchCurrentArticle = async () => {
-  //     try {
-  //       const params = {
-  //         //   "filters[isFeatured]": true,
-  //         populate: "*",
-  //         //   sort: "createdAt:desc",
-  //         //   "pagination[page]": currentPage,
-  //         //   "pagination[pageSize]": PAGE_SIZE,
-  //       };
-  //       const currentArticle = await axios.get(
-  //         `${API_URL}/api/articles/${articleId}`,
-  //         { params }
-  //       );
-  //       if (currentArticle.data && currentArticle.data.data) {
-  //         const params = {
-  //           "filters[documentId][$ne]": articleId,
-  //           // "filters[categories][documentId][$in][0]":
-  //           //   currentArticle?.categories?.documentId[0],
-  //           // "filters[categories][documentId][$in][1]":
-  //           //   currentArticle?.categories?.documentId[1],
-  //           "pagination[pageSize]": PAGE_SIZE,
-  //           populate: "*",
-  //         };
-  //         const categories = currentArticle.data.data.categories;
-
-  //         // 3. Kiểm tra xem categories có phải là mảng và có phần tử không
-  //         if (Array.isArray(categories) && categories.length > 0) {
-  //           // 4. DÙNG .MAP() ĐỂ LẤY TẤT CẢ CÁC documentId
-  //           const categoryIds = categories.map((cat) => cat.documentId);
-
-  //           // 5. GÁN CẢ MẢNG categoryIds VÀO KEY [$in]
-  //           // (Bỏ [0], [1] đi)
-  //           params["filters[categories][documentId][$in]"] = categoryIds;
-  //         }
-  //         const response = await axios.get(`${API_URL}/api/articles`, {
-  //           params,
-  //         });
-  //         if (response.data && response.data.data) {
-  //           setRelatedArticles(response.data.data);
-  //         }
-  //       }
-  //     } catch (err) {
-  //       console.error("Lỗi khi tải bài viết:", err);
-  //     }
-  //   };
-
-  //   fetchCurrentArticle();
-  // }, [articleId]);
   useEffect(() => {
     const fetchRelatedArticles = async () => {
       try {

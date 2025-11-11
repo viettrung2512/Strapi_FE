@@ -1,7 +1,6 @@
 import React from "react";
 import { Card } from "antd";
 import { Tag, Flex, Spin } from "antd";
-// import parse from "html-react-parser";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import { API_URL } from "../utils/constant";

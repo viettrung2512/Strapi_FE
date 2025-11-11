@@ -1,13 +1,13 @@
 import React from "react";
 import { Layout, Menu, Dropdown, message } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-// import { Image } from "antd";
 const { Header } = Layout;
 import { Avatar, Space } from "antd";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../utils/constant";
-
+import { Link } from "react-router-dom";
+import Notification from "./Notification";
 const appBarItems = [
   {
     key: "1",
@@ -112,14 +112,15 @@ const AppBar = () => {
           padding: "0 48px",
         }}
       >
-        <img
-          src="/images/Logo-kways.png"
-          width="150"
-          height="40"
-          alt="Kimei"
-          style={{ marginRight: "24px", display: "block", cursor: "pointer" }}
-          onClick={() => navigate("/")}
-        />
+        <Link to="/">
+          <img
+            src="/images/Logo-kways.png"
+            width="150"
+            height="40"
+            alt="Kimei"
+            style={{ marginRight: "24px", display: "block", cursor: "pointer" }}
+          />
+        </Link>
         <Menu
           theme="light"
           mode="horizontal"
@@ -133,6 +134,7 @@ const AppBar = () => {
             fontWeight: 500,
           }}
         />
+        <Notification></Notification>
         <Dropdown
           menu={{ items: userMenuItems }}
           trigger={["click"]}

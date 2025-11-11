@@ -8,36 +8,28 @@ import { Card, Tag, Col, Row, Anchor, Affix } from "antd";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import RelatedArticles from "../components/RelatedArticles";
-// import slugify from "../utils/string_to_slug"
 function ArticleDetail() {
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Giả sử bạn lấy id từ URL, ví dụ: /articles/123
   const { articleId } = useParams();
   const anchorItems = useMemo(() => {
-    // 1. Kiểm tra nếu không có nội dung thì trả về mảng rỗng
     if (!article || !article.content) {
       return [];
     }
 
-    // 2. Khởi tạo một DOMParser
     const parser = new DOMParser();
-    // 3. Parse chuỗi HTML thành một tài liệu HTML ảo
     const doc = parser.parseFromString(article.content, "text/html");
 
-    // 4. Query tất cả thẻ <h2> có trong tài liệu ảo đó
     const h2Elements = doc.querySelectorAll("h2");
 
-    // 5. Chuyển NodeList (kết quả của querySelectorAll) sang Array
-    // và map qua từng H2 để tạo object theo định dạng của Ant Design
     return Array.from(h2Elements).map((h2) => {
       const id = h2.id;
-      const title = h2.textContent || ""; // Lấy nội dung text bên trong thẻ
+      const title = h2.textContent || "";
 
       return {
         key: id,
-        href: `#${id}`, // href phải bao gồm dấu '#'
+        href: `#${id}`,
         title: title,
       };
     });
@@ -105,7 +97,6 @@ function ArticleDetail() {
           maxWidth: "1150px",
           margin: "0 auto",
           marginTop: "100px",
-          // padding: "40px",
           background: "white",
           borderRadius: "16px",
         }}
@@ -165,35 +156,6 @@ function ArticleDetail() {
               </div>
               <div>{parse(article?.content || "", options)}</div>
             </Col>
-            {/* <Col xs={24} sm={24} md={7} key={article.id}>
-              <Affix offsetTop={50}>
-                <Card
-                  className="toc-card" // Dùng className từ ví dụ trước
-                  style={{
-                    marginTop: "50px",
-                    maxWidth: 350,
-                    width: "100%",
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: "18px",
-                      fontWeight: "500",
-                    }}
-                  >
-                    Nội dung
-                  </p>
-                  <Anchor
-                    affix={false}
-                    items={anchorItems}
-                    style={{
-                      background: "transparent",
-                    }}
-                    targetOffset={110}
-                  />
-                </Card>
-              </Affix>
-            </Col> */}
             <Col xs={24} sm={24} md={7} style={{}}>
               <div>
                 <img
@@ -224,10 +186,9 @@ function ArticleDetail() {
                   affix={false}
                   items={anchorItems}
                   style={{ background: "transparent" }}
-                  targetOffset={110} // Giữ nguyên targetOffset cho header
+                  targetOffset={110}
                 />
               </Card>
-              {/* BỎ </Affix> TỪ ĐÂY */}
             </Col>
           </Row>
         </Card>

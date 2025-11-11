@@ -3,7 +3,6 @@ import {
   checkAuth,
   login as authLogin,
   register as authRegister,
-  // logout as authLogout,
 } from "../utils/auth";
 
 const AuthContext = createContext();

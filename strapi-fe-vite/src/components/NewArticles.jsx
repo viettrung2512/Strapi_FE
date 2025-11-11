@@ -22,7 +22,6 @@ const NewArticles = () => {
         const response = await axios.get(`${API_URL}/api/articles`, { params });
         if (response.data && response.data.data) {
           setNewArticles(response.data.data);
-          // Lưu tổng số bài viết (từ metadata của Strapi)
           setTotalArticles(response.data.meta.pagination.total);
         }
       } catch (err) {
@@ -42,7 +41,6 @@ const NewArticles = () => {
         style={{
           maxWidth: "1200px",
           margin: "0 auto",
-          // marginTop: "16px",
           marginBottom: "64px",
           padding: "24px",
           background: "transparents",

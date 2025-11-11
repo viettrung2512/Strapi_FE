@@ -102,7 +102,7 @@ const LargeArticleCard = ({ article }) => {
             </Paragraph>
             <div
               style={{
-                fontSize: "14px",
+                fontSize: "14px", 
                 fontFamily: "Inter, sans-serif",
                 color: "gray",
               }}

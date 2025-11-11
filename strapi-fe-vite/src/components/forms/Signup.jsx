@@ -1,5 +1,4 @@
 import { useState } from "react";
-// import { useAuth } from "../../contexts/AuthContext";
 import { Link } from "react-router-dom";
 import {
   EyeOutlined,
@@ -148,14 +147,11 @@ export default function Signup() {
     setLoading(true);
     try {
       console.log("🚀 Starting registration process...");
-      const res = await axios.post(
-        `${API_URL}/api/auth/local/register`,
-        {
-          username: values.fullName,
-          email: values.email,
-          password: values.password,
-        }
-      );
+      const res = await axios.post(`${API_URL}/api/auth/local/register`, {
+        username: values.fullName,
+        email: values.email,
+        password: values.password,
+      });
 
       const { jwt, user } = res.data;
       console.log("✅ User registered successfully:", user.id);
