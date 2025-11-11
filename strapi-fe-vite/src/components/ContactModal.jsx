@@ -4,9 +4,10 @@ import styled from "styled-components";
 import { useAuth } from "../contexts/AuthContext";
 import axios from "axios";
 import { API_URL } from "../utils/constant";
-
+import { getToken } from "firebase/messaging";
+import { messaging } from "../utils/firebase";
+import { VAPID_KEY } from "../utils/constant";
 const { TextArea } = Input;
-
 const Card = styled.div`
   border-radius: 20px;
   overflow: hidden;
@@ -84,6 +85,24 @@ const ContactModal = ({ visible, onClose }) => {
   const handleSubmit = async (values) => {
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user"));
+    let fcmToken = null;
+    try {
+      // 1. Hỏi quyền người dùng
+      const permission = await Notification.requestPermission();
+
+      if (permission === "granted") {
+        console.log("Đã được cấp quyền nhận thông báo.");
+        // 2. Lấy Token từ Firebase
+        fcmToken = await getToken(messaging, { vapidKey: VAPID_KEY });
+        console.log("FCM Token:", fcmToken);
+      } else {
+        console.warn("Người dùng không cho phép nhận thông báo.");
+      }
+    } catch (fcmError) {
+      console.error("Lỗi khi lấy FCM token:", fcmError);
+      // Không sao cả, chúng ta vẫn tiếp tục gửi form
+      // fcmToken sẽ vẫn là null
+    }
     try {
       await axios.post(
         `${API_URL}/api/questions`,
@@ -94,6 +113,7 @@ const ContactModal = ({ visible, onClose }) => {
             phoneNumber: values.phone,
             message: values.message,
             user: user.id,
+            fcmToken: fcmToken,
           },
         },
         {
@@ -104,7 +124,7 @@ const ContactModal = ({ visible, onClose }) => {
       );
       message.success("Cảm ơn bạn đã gửi phản hồi!");
       form.resetFields();
-      onClose(); // Close modal after successful submission
+      onClose();
     } catch (error) {
       console.error("Error submitting form:", error);
       message.error(

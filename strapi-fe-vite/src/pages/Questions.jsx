@@ -1,4 +1,4 @@
-import  { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Layout,
   List,
@@ -31,7 +31,9 @@ const Questions = () => {
     try {
       const token = localStorage.getItem("token");
       const user = JSON.parse(localStorage.getItem("user"));
-      if (!token || !user) {
+
+      // console.log(user.id);
+      if (!token && !user) {
         message.warning("Bạn cần đăng nhập để xem câu hỏi của mình");
         return;
       }
@@ -51,7 +53,7 @@ const Questions = () => {
       setLoading(false);
     }
   };
-
+  console.log(selected);
   const formatDate = (dateStr) =>
     new Date(dateStr).toLocaleString("vi-VN", { hour12: false });
 
@@ -112,7 +114,7 @@ const Questions = () => {
                     marginBottom: 12,
                   }}
                 >
-                  <div >
+                  <div>
                     <Text strong style={{ fontSize: 15 }}>
                       {selected.name}
                     </Text>
@@ -152,49 +154,52 @@ const Questions = () => {
 
               {/* --- Phản hồi của admin --- */}
               {selected.answer && (
-                <Card
-                  style={{
-                    borderRadius: 10,
-                    background: "#fcfcfc",
-                    padding: 24,
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                  }}
-                >
-                  <div
+                <>
+                  <span>Phản hồi của Admin</span>
+                  <Card
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      marginBottom: 12,
+                      borderRadius: 10,
+                      background: "#fcfcfc",
+                      padding: 24,
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
                     }}
                   >
-                    <div>
-                      <Text strong style={{ fontSize: 15 }}>
-                        Kways - Kimei Global
-                      </Text>
-                      <br />
-                      <Text type="secondary" style={{ fontSize: 13 }}>
-                        vtrung@yopmail.com
-                      </Text>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: 12,
+                      }}
+                    >
+                      <div>
+                        <Text strong style={{ fontSize: 15 }}>
+                          Kways - Kimei Global
+                        </Text>
+                        <br />
+                        <Text type="secondary" style={{ fontSize: 13 }}>
+                          vtrung@yopmail.com
+                        </Text>
+                      </div>
+                      <div style={{ marginLeft: "auto", textAlign: "right" }}>
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                          {formatDate(selected.answer.createdAt)}
+                        </Text>
+                      </div>
                     </div>
-                    <div style={{ marginLeft: "auto", textAlign: "right" }}>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
-                        {formatDate(selected.answer.createdAt)}
-                      </Text>
-                    </div>
-                  </div>
 
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: selected.answer.message,
-                    }}
-                    style={{
-                      fontSize: 15,
-                      lineHeight: 1.6,
-                      marginTop: 8,
-                      marginBottom: 30,
-                    }}
-                  />
-                </Card>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: selected.answer.message,
+                      }}
+                      style={{
+                        fontSize: 15,
+                        lineHeight: 1.6,
+                        marginTop: 8,
+                        marginBottom: 30,
+                      }}
+                    />
+                  </Card>
+                </>
               )}
             </div>
           ) : (
@@ -219,65 +224,68 @@ const Questions = () => {
                 itemLayout="horizontal"
                 dataSource={questions}
                 renderItem={(item) => (
-                  <List.Item
-                    onClick={() => setSelected(item)}
-                    style={{
-                      cursor: "pointer",
-                      padding: "16px 30px",
-                      borderBottom: "1px solid #f0f0f0",
-                      transition: "background 0.2s",
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.background = "#fafafa")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.background = "transparent")
-                    }
-                  >
-                    <List.Item.Meta
-                      title={
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                          }}
-                        >
-                          <Text strong>{item.name}</Text>
-                          <Tag
-                            color={
-                              item.reqStatus === "Đã phản hồi"
-                                ? "green"
-                                : "orange"
-                            }
-                            style={{ margin: 0 }}
-                          >
-                            {item.reqStatus}
-                          </Tag>
-                        </div>
+                  console.log("item", item),
+                  (
+                    <List.Item
+                      onClick={() => setSelected(item)}
+                      style={{
+                        cursor: "pointer",
+                        padding: "16px 30px",
+                        borderBottom: "1px solid #f0f0f0",
+                        transition: "background 0.2s",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.background = "#fafafa")
                       }
-                      description={
-                        <>
-                          <Text
-                            type="secondary"
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.background = "transparent")
+                      }
+                    >
+                      <List.Item.Meta
+                        title={
+                          <div
                             style={{
-                              fontSize: 13,
-                              display: "block",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                              maxWidth: "90%",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
                             }}
                           >
-                            {item.message.replace(/<[^>]+>/g, "")}
-                          </Text>
-                          <Text type="secondary" style={{ fontSize: 12 }}>
-                            {formatDate(item.createdAt)}
-                          </Text>
-                        </>
-                      }
-                    />
-                  </List.Item>
+                            <Text strong>{item.name}</Text>
+                            <Tag
+                              color={
+                                item.reqStatus === "Đã phản hồi"
+                                  ? "green"
+                                  : "orange"
+                              }
+                              style={{ margin: 0 }}
+                            >
+                              {item.reqStatus}
+                            </Tag>
+                          </div>
+                        }
+                        description={
+                          <>
+                            <Text
+                              type="secondary"
+                              style={{
+                                fontSize: 13,
+                                display: "block",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                maxWidth: "90%",
+                              }}
+                            >
+                              {item.message.replace(/<[^>]+>/g, "")}
+                            </Text>
+                            <Text type="secondary" style={{ fontSize: 12 }}>
+                              {formatDate(item.createdAt)}
+                            </Text>
+                          </>
+                        }
+                      />
+                    </List.Item>
+                  )
                 )}
               />
             </div>
