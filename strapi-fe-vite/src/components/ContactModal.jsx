@@ -75,19 +75,11 @@ const ContactModal = ({ visible, onClose }) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (visible) {
-      // Hide scrollbar when modal is open
-      document.body.style.overflow = "hidden";
-    } else {
-      // Restore scrollbar when modal is closed
-      document.body.style.overflow = "auto";
-    }
-
     // Cleanup on unmount
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [visible]);
+  }, []);
 
   const handleSubmit = async (values) => {
     const token = localStorage.getItem("token");
@@ -101,7 +93,6 @@ const ContactModal = ({ visible, onClose }) => {
             email: values.email,
             phoneNumber: values.phone,
             message: values.message,
-            reqStatus: "Đang xử lý",
             user: user.id,
           },
         },
@@ -138,7 +129,7 @@ const ContactModal = ({ visible, onClose }) => {
       footer={null}
       width="90%"
       style={{ maxWidth: "1200px" }}
-      bodyStyle={{ padding: 0, height: "80vh" }}
+      styles={{ body:{padding: 0, height: "80vh"} }}
       centered
     >
       <Card>
@@ -214,9 +205,6 @@ const ContactModal = ({ visible, onClose }) => {
                 display: "grid",
                 gridTemplateColumns: "1fr",
                 gap: "16px",
-                "@media (min-width: 768px)": {
-                  gridTemplateColumns: "1fr 1fr",
-                },
               }}
             >
               <Form.Item
