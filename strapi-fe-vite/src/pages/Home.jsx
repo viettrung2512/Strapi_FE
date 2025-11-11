@@ -1,9 +1,22 @@
+import { useState } from "react";
 import AppBar from "../components/AppBar";
 import FeaturedArticles from "../components/FeaturedArticles";
 import NewArticles from "../components/NewArticles";
 import TopArticles from "../components/TopArticles";
 import FloatingButton from "../components/FloatingButton";
+import ContactModal from "../components/ContactModal";
+
 function Home() {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
   return (
     <main
       style={{
@@ -16,7 +29,8 @@ function Home() {
       <TopArticles></TopArticles>
       <FeaturedArticles></FeaturedArticles>
       <NewArticles></NewArticles>
-      <FloatingButton />
+      <FloatingButton onClick={showModal} />
+      <ContactModal visible={isModalVisible} onClose={handleCancel} />
     </main>
   );
 }

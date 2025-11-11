@@ -9,7 +9,6 @@ import ResetPassword from "./components/forms/ResetPassword";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 
 import ArticleDetail from "./pages/ArticleDetail";
-import Contact from "./pages/Contact";
 import Questions from "./pages/Questions";
 function App() {
   return (
@@ -45,14 +44,7 @@ function App() {
             />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route
-              path="/contact"
-              element={
-                <ProtectedRoute>
-                  <Contact />
-                </ProtectedRoute>
-              }
-            />
+
             <Route
               path="/questions"
               element={
