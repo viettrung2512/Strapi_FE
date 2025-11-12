@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { useState } from "react";
 import Home from "./pages/Home";
@@ -13,10 +18,12 @@ import ArticleDetail from "./pages/ArticleDetail";
 import Questions from "./pages/Questions";
 import ContactModal from "./components/ContactModal";
 import FloatingButton from "./components/FloatingButton";
+import QuestionDetail from "./pages/QuestionDetail";
 
 const AppContent = () => {
   const [contactModalVisible, setContactModalVisible] = useState(false);
   const location = useLocation();
+  const [questionsList, setQuestionsList] = useState([]);
 
   const handleOpenContactModal = () => {
     setContactModalVisible(true);
@@ -25,8 +32,15 @@ const AppContent = () => {
   const handleCloseContactModal = () => {
     setContactModalVisible(false);
   };
-
-  const isAuthPage = ['/login', '/signup', '/forgot-password', '/reset-password'].includes(location.pathname);
+  const handleQuestionAdded = (newQuestion) => {
+    setQuestionsList((prevQuestions) => [newQuestion, ...prevQuestions]);
+  };
+  const isAuthPage = [
+    "/login",
+    "/signup",
+    "/forgot-password",
+    "/reset-password",
+  ].includes(location.pathname);
 
   return (
     <div className="App">
@@ -57,6 +71,7 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         />
+
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
@@ -64,7 +79,15 @@ const AppContent = () => {
           path="/questions"
           element={
             <ProtectedRoute>
-              <Questions />
+              <Questions questions={questionsList} setQuestions={setQuestionsList} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/questions/:questionId"
+          element={
+            <ProtectedRoute>
+              <QuestionDetail />
             </ProtectedRoute>
           }
         />
@@ -79,6 +102,7 @@ const AppContent = () => {
           <ContactModal
             visible={contactModalVisible}
             onClose={handleCloseContactModal}
+            onQuestionAdded={handleQuestionAdded}
           />
         </>
       )}

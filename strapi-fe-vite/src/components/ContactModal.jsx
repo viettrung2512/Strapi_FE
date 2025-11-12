@@ -71,7 +71,7 @@ const LeftPanel = styled.div`
   }
 `;
 
-const ContactModal = ({ visible, onClose }) => {
+const ContactModal = ({ visible, onClose, onQuestionAdded }) => {
   const { user } = useAuth();
   const [form] = Form.useForm();
 
@@ -125,6 +125,18 @@ const ContactModal = ({ visible, onClose }) => {
       message.success("Cảm ơn bạn đã gửi phản hồi!");
       form.resetFields();
       onClose();
+      const newQuestion = {
+        id: Date.now(), // ID tạm thời
+        attributes: {
+          name: values.name,
+          email: values.email,
+          phoneNumber: values.phone,
+          message: values.message,
+          reqStatus: "Đang xử lý",
+          createdAt: new Date().toISOString(),
+        },
+      };
+      onQuestionAdded(newQuestion);
     } catch (error) {
       console.error("Error submitting form:", error);
       message.error(
@@ -149,7 +161,7 @@ const ContactModal = ({ visible, onClose }) => {
       footer={null}
       width="90%"
       style={{ maxWidth: "1200px" }}
-      styles={{ body:{padding: 0, height: "80vh"} }}
+      styles={{ body: { padding: 0, height: "80vh" } }}
       centered
     >
       <Card>
