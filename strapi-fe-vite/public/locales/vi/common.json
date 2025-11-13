@@ -1,0 +1,18 @@
+{
+  "contact": {
+    "title": "Bắt đầu với tư vấn MIỄN PHÍ ngay hôm nay!",
+    "subtitle": "Sẵn sàng chuyển đổi doanh nghiệp với các giải pháp công nghệ đổi mới?",
+    "name": "Họ và tên",
+    "phone": "Số điện thoại",
+    "email": "E-mail",
+    "message": "Tin nhắn",
+    "category": "Loại yêu cầu",
+    "submit": "Gửi câu hỏi",
+    "response_time": "Thường phản hồi trong {{time}} trong giờ hành chính"
+  },
+  "categories": {
+    "support": "Hỗ trợ kỹ thuật",
+    "sales": "Tư vấn bán hàng", 
+    "partnership": "Hợp tác"
+  }
+}

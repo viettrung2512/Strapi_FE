@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Layout, Tag, Typography, Spin, message, Button, Card } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; //
 import axios from "axios";
 import { API_URL } from "../utils/constant";
 import AppBar from "../components/AppBar";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../utils/firebase";
+import ContactModal from "../components/ContactModal";
+import FloatingButton from "../components/FloatingButton";
 
 const { Content } = Layout;
 const { Text } = Typography;
@@ -17,16 +19,28 @@ const formatDate = (dateStr) =>
 const QuestionDetail = () => {
   const { questionId } = useParams();
   const navigate = useNavigate();
+  // const location = useLocation(); // THÊM location
 
-  // State lấy dữ liệu từ strapi
+  // State lấy dữ liệu từ strapi - NHẬN TỪ LOCATION STATE ĐẦU TIÊN
   const [question, setQuestion] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!location.state?.question); // Chỉ loading nếu không có data từ state
 
   // State lấy dữ liệu từ firestore
   const [realtimeData, setRealtimeData] = useState(null);
+  const [contactModalVisible, setContactModalVisible] = useState(false);
+
+  const handleOpenContactModal = () => {
+    setContactModalVisible(true);
+  };
+
+  const handleCloseContactModal = () => {
+    setContactModalVisible(false);
+  };
+
 
   useEffect(() => {
     if (!questionId) return;
+
     const fetchQuestion = async () => {
       setLoading(true);
       try {
@@ -52,7 +66,8 @@ const QuestionDetail = () => {
     };
 
     fetchQuestion();
-  }, [questionId]);
+  },[questionId]);
+
   // xử lý realtime
   useEffect(() => {
     if (!questionId) return;
@@ -60,7 +75,6 @@ const QuestionDetail = () => {
     const questionDocRef = doc(db, "questions", String(questionId));
     console.log(`[DEBUG] Bắt đầu lắng nghe real-time cho QID: ${questionId}`);
 
-    // onSnapshot là hàm "lắng nghe"
     const unsubscribe = onSnapshot(questionDocRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
@@ -95,16 +109,32 @@ const QuestionDetail = () => {
   }
 
   if (!question) {
-    return <div>Không tìm thấy câu hỏi.</div>;
+    return (
+      <>
+        <AppBar />
+        <Layout style={{ marginTop: 60, minHeight: "calc(100vh - 60px)" }}>
+          <Content style={{ padding: "50px", textAlign: "center" }}>
+            <Button
+              type="link"
+              icon={<ArrowLeftOutlined />}
+              onClick={() => navigate("/questions")}
+              style={{ marginBottom: 20 }}
+            >
+              Quay lại danh sách
+            </Button>
+            <div>Không tìm thấy câu hỏi.</div>
+          </Content>
+        </Layout>
+      </>
+    );
   }
 
-  // Lấy dữ liệu gốc từ Strapi (đã có .attributes)
-  //   const { attributes } = question;
-
   // Trộn dữ liệu: Ưu tiên real-time, nếu không có thì dùng dữ liệu gốc
-  const currentStatus = realtimeData?.status || question?.reqStatus;
+  const currentStatus =
+    realtimeData?.status || question.reqStatus || "Đang xử lý";
   const currentAnswerHtml = realtimeData?.answer;
-  const originalAnswer = question?.answer;
+  const originalAnswer = question.answer;
+
   return (
     <>
       <AppBar />
@@ -156,12 +186,15 @@ const QuestionDetail = () => {
               </div>
               <div style={{ marginLeft: "auto", textAlign: "right" }}>
                 <Text type="secondary" style={{ fontSize: 12 }}>
-                  {formatDate(question?.createdAt)}
+                  {formatDate(question.createdAt)}
                 </Text>
                 <br />
                 <Tag
                   color={
-                    currentStatus === "Đã được phản hồi" ? "green" : "orange"
+                    currentStatus === "Đã phản hồi" ||
+                    currentStatus === "Đã được phản hồi"
+                      ? "green"
+                      : "orange"
                   }
                   style={{ marginTop: 4 }}
                 >
@@ -180,6 +213,7 @@ const QuestionDetail = () => {
               }}
             />
           </Card>
+
           {/* phản hồi của admin */}
           {(currentAnswerHtml || originalAnswer) && (
             <>
@@ -242,6 +276,16 @@ const QuestionDetail = () => {
           )}
         </Content>
       </Layout>
+
+      <FloatingButton
+        onClick={handleOpenContactModal}
+        tooltip="Gửi câu hỏi mới"
+      />
+
+      <ContactModal
+        visible={contactModalVisible}
+        onClose={handleCloseContactModal}
+      />
     </>
   );
 };

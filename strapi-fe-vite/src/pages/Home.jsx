@@ -1,11 +1,24 @@
+import { useState } from "react";
 import AppBar from "../components/AppBar";
 import FeaturedArticles from "../components/FeaturedArticles";
 import NewArticles from "../components/NewArticles";
 import TopArticles from "../components/TopArticles";
+import ContactModal from "../components/ContactModal";
+import FloatingButton from "../components/FloatingButton";
 
-function Home() {
+const Home = () => {
+  const [contactModalVisible, setContactModalVisible] = useState(false);
+
+  const handleOpenContactModal = () => {
+    setContactModalVisible(true);
+  };
+
+  const handleCloseContactModal = () => {
+    setContactModalVisible(false);
+  };
+
   return (
-    <main
+    <div
       style={{
         background: "#f0f8ff",
         width: "100%",
@@ -16,8 +29,18 @@ function Home() {
       <TopArticles></TopArticles>
       <FeaturedArticles></FeaturedArticles>
       <NewArticles></NewArticles>
-    </main>
+
+      <FloatingButton
+        onClick={handleOpenContactModal}
+        tooltip="Liên hệ với chúng tôi"
+      />
+
+      <ContactModal
+        visible={contactModalVisible}
+        onClose={handleCloseContactModal}
+      />
+    </div>
   );
-}
+};
 
 export default Home;

@@ -7,92 +7,171 @@ import { API_URL } from "../utils/constant";
 import { getToken } from "firebase/messaging";
 import { messaging } from "../utils/firebase";
 import { VAPID_KEY } from "../utils/constant";
+
 const { TextArea } = Input;
+
 const Card = styled.div`
   border-radius: 20px;
   overflow: hidden;
   width: 100%;
   max-width: 1200px;
-  height: 100%;
+  height: auto;
+  min-height: 500px;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
   margin: 0 auto;
   transition: all 0.3s ease;
 
-  @media (min-width: 992px) {
-    grid-template-columns: 1fr 1fr;
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: 80vh;
+    min-height: 600px;
+    overflow-y: auto;
   }
 
   @media (min-width: 1440px) {
-    max-width: 1280px;
+    max-width: 1280px;px;
+  }
+
+  @media (max-width: 480px) {
+    border-radius: 12px;
+    min-height: 500px;
   }
 `;
 
 const LeftPanel = styled.div`
   background: linear-gradient(to bottom right, #60a5fa, #2563eb);
   color: white;
-  padding: 48px 40px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: start center;
   align-items: center;
   text-align: center;
+  gap: 20px;
+  min-height: 300px;
 
-  h1 {
-    font-size: 2.2rem;
-    font-weight: bold;
-    margin-bottom: 24px;
-    line-height: 1.3;
+  @media (max-width: 768px) {
+    padding: 20px 16px;
+    gap: 16px;
+    min-height: 200px;
+    flex-shrink: 0;
   }
 
-  p {
-    font-size: 1.05rem;
-    line-height: 1.6;
-    opacity: 0.95;
-    margin-bottom: 24px;
+  @media (min-width: 769px) and (max-width: 992px) {
+    padding: 32px 24px;
+    gap: 24px;
   }
 
-  img {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-  }
+  @media (min-width: 993px) {
+    padding: 40px 32px;
+    height: 600px;
 
-  @media (min-width: 1200px) {
-    h1 {
-      font-size: 2.5rem;
-    }
-    p {
-      font-size: 1.125rem;
-    }
-    img {
-      width: 100%;
-    }
+    gap: 32px;
   }
 `;
 
-const ContactModal = ({ visible, onClose, onQuestionAdded }) => {
+const ContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    gap: 16px;
+  }
+`;
+
+const Title = styled.h1`
+  font-size: 1.8rem;
+  font-weight: bold;
+  line-height: 1.2;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 1.4rem;
+  }
+
+  @media (min-width: 769px) and (max-width: 992px) {
+    font-size: 2rem;
+  }
+
+  @media (min-width: 993px) {
+    font-size: 2.2rem;
+  }
+`;
+
+const Description = styled.p`
+  font-size: 1rem;
+  line-height: 1.5;
+  opacity: 0.95;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  @media (min-width: 769px) and (max-width: 992px) {
+    font-size: 1.05rem;
+  }
+
+  @media (min-width: 993px) {
+    font-size: 1.1rem;
+  }
+`;
+
+const RightPanel = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  background: white;
+  overflow-y: auto;
+
+  @media (max-width: 768px) {
+    padding: 20px 16px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  @media (min-width: 769px) and (max-width: 992px) {
+    padding: 0 24px;
+  }
+
+  @media (min-width: 993px) {
+    padding: 15px 32px;
+  }
+`;
+
+const FormGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+`;
+
+const FullWidthItem = styled.div`
+  grid-column: 1 / -1;
+`;
+
+const ContactModal = ({ visible, onClose, onAddQuestion = () => {} }) => {
   const { user } = useAuth();
   const [form] = Form.useForm();
-
-  useEffect(() => {
-    // Cleanup on unmount
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, []);
 
   const handleSubmit = async (values) => {
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user"));
     let fcmToken = null;
     try {
-      // 1. Hỏi quyền người dùng
       const permission = await Notification.requestPermission();
 
       if (permission === "granted") {
         console.log("Đã được cấp quyền nhận thông báo.");
-        // 2. Lấy Token từ Firebase
         fcmToken = await getToken(messaging, { vapidKey: VAPID_KEY });
         console.log("FCM Token:", fcmToken);
       } else {
@@ -100,9 +179,8 @@ const ContactModal = ({ visible, onClose, onQuestionAdded }) => {
       }
     } catch (fcmError) {
       console.error("Lỗi khi lấy FCM token:", fcmError);
-      // Không sao cả, chúng ta vẫn tiếp tục gửi form
-      // fcmToken sẽ vẫn là null
     }
+
     try {
       await axios.post(
         `${API_URL}/api/questions`,
@@ -124,19 +202,8 @@ const ContactModal = ({ visible, onClose, onQuestionAdded }) => {
       );
       message.success("Cảm ơn bạn đã gửi phản hồi!");
       form.resetFields();
+      onAddQuestion?.();
       onClose();
-      const newQuestion = {
-        id: Date.now(), // ID tạm thời
-        attributes: {
-          name: values.name,
-          email: values.email,
-          phoneNumber: values.phone,
-          message: values.message,
-          reqStatus: "Đang xử lý",
-          createdAt: new Date().toISOString(),
-        },
-      };
-      onQuestionAdded(newQuestion);
     } catch (error) {
       console.error("Error submitting form:", error);
       message.error(
@@ -159,69 +226,65 @@ const ContactModal = ({ visible, onClose, onQuestionAdded }) => {
       open={visible}
       onCancel={onClose}
       footer={null}
-      width="90%"
-      style={{ maxWidth: "1200px" }}
-      styles={{ body: { padding: 0, height: "80vh" } }}
+      width="95%"
+      style={{
+        maxWidth: "1200px",
+      }}
+      styles={{
+        body: {
+          padding: 0,
+          height: "auto",
+          maxHeight: "90vh",
+          overflow: "hidden",
+        },
+      }}
       centered
     >
       <Card>
         <LeftPanel>
-          <h1>
-            Start with a <span style={{ color: "white" }}>FREE</span>
-            <br />
-            Consultation today!
-          </h1>
+          <ContentWrapper>
+            <div>
+              <Title>
+                Start with a <span style={{ color: "white" }}>FREE</span>
+                <br />
+                Consultation today!
+              </Title>
+            </div>
 
-          <p
-            style={{
-              fontSize: "1.125rem",
-              marginBottom: "32px",
-              opacity: 0.95,
-              lineHeight: 1.6,
-            }}
-          >
-            Ready to transform your business with innovative technology
-            solutions? KIMEI Global delivers practical solutions and expert
-            guidance to align your digital team with business goals
-          </p>
+            <div>
+              <Description>
+                Ready to transform your business with innovative technology
+                solutions? KIMEI Global delivers practical solutions and expert
+                guidance to align your digital team with business goals
+              </Description>
+            </div>
 
-          <p
-            style={{
-              fontSize: "1rem",
-              opacity: 0.9,
-              marginBottom: "32px",
-            }}
-          >
-            Drop us a message, and we'll get back to you within 1 - 3 business
-            days!
-          </p>
-
-          {/* Illustration Placeholder */}
-          <div
-            style={{
-              width: "100%",
-              height: "256px",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              overflow: "hidden",
-            }}
-          >
-            <img
-              src="/images/contact.png"
-              alt="contact"
+            <div
               style={{
                 width: "100%",
-                height: "100%",
-                objectFit: "cover",
+                height: "256px",
                 borderRadius: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
               }}
-            />
-          </div>
+            >
+              <img
+                src="/images/contact.png"
+                alt="contact"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                }}
+              />
+            </div>
+          </ContentWrapper>
         </LeftPanel>
-        {/* Right Form Section */}
-        <div style={{ padding: "40px 48px" }}>
+
+        <RightPanel>
           <Form
             form={form}
             layout="vertical"
@@ -230,56 +293,62 @@ const ContactModal = ({ visible, onClose, onQuestionAdded }) => {
               name: user?.username || "",
               email: user?.email || "",
             }}
+            style={{ width: "100%" }}
           >
-            {/* Name and Phone Row */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr",
-                gap: "16px",
-              }}
-            >
-              <Form.Item
-                name="name"
-                label="Your name"
-                rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
-              >
-                <Input placeholder="Enter your name" />
-              </Form.Item>
+            <FormGrid>
+              <FullWidthItem>
+                <Form.Item
+                  name="name"
+                  label="Họ và tên"
+                  labelCol={{ style: { fontWeight: "600" } }}
+                  rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
+                >
+                  <Input size="large" placeholder="Enter your name" />
+                </Form.Item>
+              </FullWidthItem>
+
               <Form.Item
                 name="phone"
-                label="Phone number"
+                label="Số điện thoại"
+                labelCol={{ style: { fontWeight: "600" } }}
                 rules={[
                   { required: true, message: "Vui lòng nhập số điện thoại!" },
                   { validator: validatePhone },
                 ]}
               >
-                <Input placeholder="Enter your phone number" />
+                <Input size="large" placeholder="Enter your phone number" />
               </Form.Item>
-            </div>
 
-            {/* Email Row */}
-            <Form.Item
-              name="email"
-              label="E-mail"
-              rules={[
-                { required: true, message: "Vui lòng nhập email!" },
-                { type: "email", message: "Email không hợp lệ!" },
-              ]}
-            >
-              <Input placeholder="yourname@gmail.com" />
-            </Form.Item>
+              <Form.Item
+                name="email"
+                label="E-mail"
+                labelCol={{ style: { fontWeight: "600" } }}
+                rules={[
+                  { required: true, message: "Vui lòng nhập email!" },
+                  { type: "email", message: "Email không hợp lệ!" },
+                ]}
+              >
+                <Input size="large" placeholder="yourname@gmail.com" />
+              </Form.Item>
+            </FormGrid>
 
-            {/* Message Textarea */}
             <Form.Item name="message" label="Message">
-              <TextArea placeholder="Tell us about your needs" rows={5} />
+              <TextArea
+                placeholder="Tell us about your needs"
+                rows={10}
+                style={{
+                  resize: "vertical",
+                  minHeight: "200px",
+                  fontWWeight: "600",
+                }}
+              />
             </Form.Item>
 
-            {/* Submit Button */}
-            <Form.Item>
+            <Form.Item style={{ marginBottom: 0 }}>
               <Button
                 type="primary"
                 htmlType="submit"
+                size="large"
                 style={{
                   width: "100%",
                   background: "#2563eb",
@@ -289,11 +358,11 @@ const ContactModal = ({ visible, onClose, onQuestionAdded }) => {
                   fontWeight: "600",
                 }}
               >
-                Submit
+                Gửi câu hỏi
               </Button>
             </Form.Item>
           </Form>
-        </div>
+        </RightPanel>
       </Card>
     </Modal>
   );

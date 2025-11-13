@@ -8,11 +8,24 @@ import { Card, Tag, Col, Row, Anchor, Affix } from "antd";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import RelatedArticles from "../components/RelatedArticles";
+import ContactModal from "../components/ContactModal";
+import FloatingButton from "../components/FloatingButton";
+
 function ArticleDetail() {
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const { articleId } = useParams();
+  const [contactModalVisible, setContactModalVisible] = useState(false);
+
+  const handleOpenContactModal = () => {
+    setContactModalVisible(true);
+  };
+
+  const handleCloseContactModal = () => {
+    setContactModalVisible(false);
+  };
+
   const anchorItems = useMemo(() => {
     if (!article || !article.content) {
       return [];
@@ -194,6 +207,15 @@ function ArticleDetail() {
         </Card>
       </div>
       <RelatedArticles></RelatedArticles>
+      <FloatingButton
+        onClick={handleOpenContactModal}
+        tooltip="Liên hệ với chúng tôi"
+      />
+
+      <ContactModal
+        visible={contactModalVisible}
+        onClose={handleCloseContactModal}
+      />
     </>
   );
 }

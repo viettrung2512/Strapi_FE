@@ -19,6 +19,7 @@ const AvatarUpload = ({ onAvatarChange }) => {
     });
   };
 
+
   const beforeUpload = async (file) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     if (!isJpgOrPng) {

@@ -1,0 +1,18 @@
+{
+  "contact": {
+    "title": "Start with a FREE Consultation today!",
+    "subtitle": "Ready to transform your business with innovative technology solutions?",
+    "name": "Your name",
+    "phone": "Phone number", 
+    "email": "E-mail",
+    "message": "Message",
+    "category": "Request type",
+    "submit": "Submit",
+    "response_time": "Usually respond within {{time}} during business hours"
+  },
+  "categories": {
+    "support": "Technical Support",
+    "sales": "Sales Consultation",
+    "partnership": "Partnership"
+  }
+}

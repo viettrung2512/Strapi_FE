@@ -1,7 +1,14 @@
 import { Button } from 'antd';
 import { MessageCircle } from 'lucide-react';
 
-const FloatingButton = ({ onClick, icon = <MessageCircle />, tooltip }) => {
+const FloatingButton = ({ 
+  onClick, 
+  icon = <MessageCircle />, 
+  tooltip = "Liên hệ với chúng tôi",
+  position = "fixed",
+  bottom = "20px",
+  right = "20px" 
+}) => {
   return (
     <Button
       type="primary"
@@ -11,9 +18,9 @@ const FloatingButton = ({ onClick, icon = <MessageCircle />, tooltip }) => {
       onClick={onClick}
       title={tooltip}
       style={{
-        position: 'fixed',
-        bottom: '20px',
-        right: '20px',
+        position: position,
+        bottom: bottom,
+        right: right,
         zIndex: 1000,
       }}
     />

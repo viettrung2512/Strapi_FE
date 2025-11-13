@@ -4,6 +4,7 @@ import {
   Route,
   useLocation,
 } from "react-router-dom";
+import './utils/i18n';
 import { AuthProvider } from "./contexts/AuthContext";
 import { useState } from "react";
 import Home from "./pages/Home";
@@ -13,28 +14,14 @@ import Profile from "./components/forms/Profile";
 import ForgotPassword from "./components/forms/ForgotPassword";
 import ResetPassword from "./components/forms/ResetPassword";
 import ProtectedRoute from "./components/common/ProtectedRoute";
-
 import ArticleDetail from "./pages/ArticleDetail";
 import Questions from "./pages/Questions";
-import ContactModal from "./components/ContactModal";
-import FloatingButton from "./components/FloatingButton";
 import QuestionDetail from "./pages/QuestionDetail";
 
 const AppContent = () => {
-  const [contactModalVisible, setContactModalVisible] = useState(false);
   const location = useLocation();
   const [questionsList, setQuestionsList] = useState([]);
 
-  const handleOpenContactModal = () => {
-    setContactModalVisible(true);
-  };
-
-  const handleCloseContactModal = () => {
-    setContactModalVisible(false);
-  };
-  const handleQuestionAdded = (newQuestion) => {
-    setQuestionsList((prevQuestions) => [newQuestion, ...prevQuestions]);
-  };
   const isAuthPage = [
     "/login",
     "/signup",
@@ -71,10 +58,8 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         />
-
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-
         <Route
           path="/questions"
           element={
@@ -93,19 +78,6 @@ const AppContent = () => {
         />
         <Route path="*" element={<Home />} />
       </Routes>
-      {!isAuthPage && (
-        <>
-          <FloatingButton
-            onClick={handleOpenContactModal}
-            tooltip="Đi đến trang Liên hệ"
-          />
-          <ContactModal
-            visible={contactModalVisible}
-            onClose={handleCloseContactModal}
-            onQuestionAdded={handleQuestionAdded}
-          />
-        </>
-      )}
     </div>
   );
 };

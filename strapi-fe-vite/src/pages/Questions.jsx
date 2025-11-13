@@ -14,6 +14,8 @@ import {
   getDocs,
   writeBatch,
 } from "firebase/firestore";
+import ContactModal from "../components/ContactModal";
+import FloatingButton from "../components/FloatingButton";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -63,12 +65,22 @@ const markNotificationAsRead = async (questionId) => {
   }
 };
 
-const Questions = ({ questions, setQuestions }) => {
-  // const [questions, setQuestions] = useState([]);
+const Questions = () => {
   const [loading, setLoading] = useState(false);
   const [realtimeUpdates, setRealtimeUpdates] = useState({});
   const navigate = useNavigate();
+  const [questions, setQuestions] = useState([]);
+  const [contactModalVisible, setContactModalVisible] = useState(false);
 
+  const handleOpenContactModal = () => {
+    setContactModalVisible(true);
+  };
+
+  const handleCloseContactModal = () => {
+    setContactModalVisible(false);
+  };
+
+  
   useEffect(() => {
     fetchQuestions();
   }, []);
@@ -100,11 +112,6 @@ const Questions = ({ questions, setQuestions }) => {
 
   useEffect(() => {
     if (questions.length === 0) return;
-
-    console.log(
-      `[DEBUG] Bắt đầu lắng nghe real-time cho ${questions.length} câu hỏi.`
-    );
-
     const unsubscribers = questions.map((question) => {
       const questionDocRef = doc(db, "questions", String(question.documentId));
       return onSnapshot(questionDocRef, (docSnap) => {
@@ -118,7 +125,6 @@ const Questions = ({ questions, setQuestions }) => {
       });
     });
     return () => {
-      console.log("[DEBUG] Đang dừng tất cả các máy lắng nghe...");
       unsubscribers.forEach((unsub) => unsub());
     };
   }, [questions]);
@@ -127,16 +133,11 @@ const Questions = ({ questions, setQuestions }) => {
     markNotificationAsRead(item?.documentId);
     navigate(`/questions/${item?.documentId}`);
   };
-  const getQuestionData = (item) => {
-    if (item.attributes) {
-      return {
-        id: item.id,
-        ...item.attributes,
-      };
-    }
-    return item;
+  
+  const handleAddQuestion = () => {
+    fetchQuestions();
   };
-  // console.log(getQuestionData);
+
   return (
     <>
       <AppBar />
@@ -188,15 +189,12 @@ const Questions = ({ questions, setQuestions }) => {
                 itemLayout="horizontal"
                 dataSource={questions}
                 renderItem={(item) => {
-                  const questionData = getQuestionData(item);
-                  console.log("quesdata: ", questionData);
-                  const updates = realtimeUpdates[questionData.documentId];
-                  const currentStatus =
-                    updates?.status || questionData?.reqStatus;
-                  console.log("currentstatus: ", currentStatus);
+                  console.log("item ", item);
+                  const updates = realtimeUpdates[item.documentId];
+                  const currentStatus = updates?.status || item.reqStatus;
                   return (
                     <List.Item
-                      onClick={() => handleQuestionClick(questionData)}
+                      onClick={() => handleQuestionClick(item)}
                       style={{
                         cursor: "pointer",
                         padding: "16px 30px",
@@ -219,7 +217,7 @@ const Questions = ({ questions, setQuestions }) => {
                               alignItems: "center",
                             }}
                           >
-                            <Text strong>{questionData?.name}</Text>
+                            <Text strong>{item.name}</Text>
                             <Tag
                               color={
                                 currentStatus === "Đã được phản hồi"
@@ -245,11 +243,10 @@ const Questions = ({ questions, setQuestions }) => {
                                 maxWidth: "90%",
                               }}
                             >
-                              {questionData?.message?.replace(/<[^>]+>/g, "") ||
-                                ""}
+                              {item.message?.replace(/<[^>]+>/g, "") || ""}
                             </Text>
                             <Text type="secondary" style={{ fontSize: 12 }}>
-                              {formatDate(questionData?.createdAt)}
+                              {formatDate(item?.createdAt)}
                             </Text>
                           </>
                         }
@@ -262,6 +259,16 @@ const Questions = ({ questions, setQuestions }) => {
           )}
         </Content>
       </Layout>
+      <FloatingButton
+        onClick={handleOpenContactModal}
+        tooltip="Gửi câu hỏi mới"
+      />
+
+      <ContactModal
+        visible={contactModalVisible}
+        onClose={handleCloseContactModal}
+        onAddQuestion={handleAddQuestion}
+      />
     </>
   );
 };

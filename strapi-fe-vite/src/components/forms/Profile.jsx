@@ -16,6 +16,8 @@ import Button from "../common/Button";
 import { API_URL } from "../../utils/constant";
 import { useAuth } from "../../contexts/AuthContext";
 import AppBar from "../AppBar";
+import ContactModal from "../ContactModal";
+import FloatingButton from "../FloatingButton";
 
 // Styled Components
 const ProfileContainer = styled.div`
@@ -39,7 +41,7 @@ const ProfileCard = styled.div`
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
-  
+
   @media (max-width: 750px) {
     width: 100%;
     max-width: 48rem;
@@ -167,13 +169,22 @@ export default function Profile() {
   const [currentAvatar, setCurrentAvatar] = useState(null);
   const [form] = Form.useForm();
   const [passwordForm] = Form.useForm();
+  const [contactModalVisible, setContactModalVisible] = useState(false);
+
+  const handleOpenContactModal = () => {
+    setContactModalVisible(true);
+  };
+
+  const handleCloseContactModal = () => {
+    setContactModalVisible(false);
+  };
 
   useEffect(() => {
     // ✅ Kiểm tra user tồn tại trước khi set form values
     if (user) {
       form.setFieldsValue({
-        fullName: user.username || '',
-        email: user.email || '',
+        fullName: user.username || "",
+        email: user.email || "",
       });
 
       if (user.avatar && user.avatar.url) {
@@ -208,16 +219,12 @@ export default function Profile() {
         const formData = new FormData();
         formData.append("files", avatarFile);
 
-        const uploadRes = await axios.post(
-          `${API_URL}/api/upload`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const uploadRes = await axios.post(`${API_URL}/api/upload`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (uploadRes.data && uploadRes.data[0]) {
           avatarId = uploadRes.data[0].id;
@@ -236,17 +243,13 @@ export default function Profile() {
 
       console.log("Sending update data:", updateData);
       console.log("User ID:", user.id);
-      
-      await axios.put(
-        `${API_URL}/api/users/${user.id}`,
-        updateData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+
+      await axios.put(`${API_URL}/api/users/${user.id}`, updateData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       // ✅ Cập nhật AuthContext và localStorage
       const updatedUser = {
@@ -254,8 +257,8 @@ export default function Profile() {
         username: values.fullName,
         avatar: {
           id: avatarId,
-          url: avatarUrl
-        }
+          url: avatarUrl,
+        },
       };
 
       updateUser(updatedUser);
@@ -345,227 +348,242 @@ export default function Profile() {
               </HomeButton>
             </ProfileHeading>
 
-          <StyledTabs
-            defaultActiveKey="profile"
-            items={[
-              {
-                key: "profile",
-                label: (
-                  <span>
-                    <UserOutlined />
-                    Thông tin cá nhân
-                  </span>
-                ),
-                children: (
-                  <TabContent>
-                    <FormContent>
-                      <UserAvatarSection>
-                        <AvatarLabel>Avatar hiện tại</AvatarLabel>
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            marginBottom: "1.5rem",
-                          }}
-                        >
-                          <AvatarUpload
-                            onAvatarChange={handleAvatarChange}
-                            initialImage={currentAvatar}
-                            showPreview={true}
-                          />
-                        </div>
-                      </UserAvatarSection>
-
-                      <Form
-                        form={form}
-                        name="profile"
-                        onFinish={onFinish}
-                        layout="vertical"
-                      >
-                        <UserInfoSection>
-                          <Form.Item
-                            name="fullName"
-                            label="Họ và tên"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Vui lòng nhập họ và tên!",
-                              },
-                            ]}
+            <StyledTabs
+              defaultActiveKey="profile"
+              items={[
+                {
+                  key: "profile",
+                  label: (
+                    <span>
+                      <UserOutlined />
+                      Thông tin cá nhân
+                    </span>
+                  ),
+                  children: (
+                    <TabContent>
+                      <FormContent>
+                        <UserAvatarSection>
+                          <AvatarLabel>Avatar hiện tại</AvatarLabel>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              marginBottom: "1.5rem",
+                            }}
                           >
-                            <Input
-                              prefix={<UserOutlined />}
-                              placeholder="Nhập họ và tên"
-                              size="large"
+                            <AvatarUpload
+                              onAvatarChange={handleAvatarChange}
+                              initialImage={currentAvatar}
+                              showPreview={true}
                             />
-                          </Form.Item>
+                          </div>
+                        </UserAvatarSection>
 
-                          <Form.Item name="email" label="Email">
-                            <Input
-                              prefix={<UserOutlined />}
-                              disabled
-                              size="large"
-                            />
-                          </Form.Item>
-                        </UserInfoSection>
-
-                        <ProfileButton
-                          type="primary"
-                          htmlType="submit"
-                          loading={loading}
+                        <Form
+                          form={form}
+                          name="profile"
+                          onFinish={onFinish}
+                          layout="vertical"
                         >
-                          Cập nhật thông tin
-                        </ProfileButton>
-                      </Form>
-                    </FormContent>
-                  </TabContent>
-                ),
-              },
-              {
-                key: "password",
-                label: (
-                  <span>
-                    <LockOutlined />
-                    Đổi mật khẩu
-                  </span>
-                ),
-                children: (
-                  <TabContent>
-                    <FormContent>
-                      <AlertMessage>
-                        <SafetyOutlined /> Để bảo vệ tài khoản của bạn, vui lòng
-                        sử dụng mật khẩu mạnh và không chia sẻ với người khác.
-                      </AlertMessage>
-
-                      <Form
-                        form={passwordForm}
-                        name="password"
-                        onFinish={onPasswordFinish}
-                        layout="vertical"
-                      >
-                        <UserInfoSection>
-                          <SectionTitle>
-                            <LockOutlined />
-                            Thay đổi mật khẩu
-                          </SectionTitle>
-
-                          <Form.Item
-                            name="currentPassword"
-                            label="Mật khẩu hiện tại"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Vui lòng nhập mật khẩu hiện tại!",
-                              },
-                            ]}
-                          >
-                            <Input.Password
-                              prefix={<LockOutlined />}
-                              placeholder="Nhập mật khẩu hiện tại"
-                              size="large"
-                              iconRender={(visible) =>
-                                visible ? (
-                                  <EyeInvisibleOutlined />
-                                ) : (
-                                  <EyeOutlined />
-                                )
-                              }
-                            />
-                          </Form.Item>
-                          <Form.Item
-                            name="newPassword"
-                            label="Mật khẩu mới"
-                            rules={[
-                              {
-                                required: true,
-                                message: "Vui lòng nhập mật khẩu mới!",
-                              },
-                              {
-                                min: 6,
-                                message: "Mật khẩu phải có ít nhất 6 ký tự!",
-                              },
-                              ({ getFieldValue }) => ({
-                                validator(_, value) {
-                                  if (!value || getFieldValue("currentPassword") !== value) {
-                                    return Promise.resolve();
-                                  }
-                                  return Promise.reject(
-                                    new Error("Mật khẩu mới không được trùng với mật khẩu hiện tại!")
-                                  );
+                          <UserInfoSection>
+                            <Form.Item
+                              name="fullName"
+                              label="Họ và tên"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Vui lòng nhập họ và tên!",
                                 },
-                              }),
-                            ]}
-                          >
-                            <Input.Password
-                              prefix={<LockOutlined />}
-                              placeholder="Nhập mật khẩu mới"
-                              size="large"
-                              iconRender={(visible) =>
-                                visible ? (
-                                  <EyeInvisibleOutlined />
-                                ) : (
-                                  <EyeOutlined />
-                                )
-                              }
-                            />
-                          </Form.Item>
+                              ]}
+                            >
+                              <Input
+                                prefix={<UserOutlined />}
+                                placeholder="Nhập họ và tên"
+                                size="large"
+                              />
+                            </Form.Item>
 
-                          <Form.Item
-                            name="confirmPassword"
-                            label="Xác nhận mật khẩu mới"
-                            dependencies={["newPassword"]}
-                            rules={[
-                              {
-                                required: true,
-                                message: "Vui lòng xác nhận mật khẩu mới!",
-                              },
-                              ({ getFieldValue }) => ({
-                                validator(_, value) {
-                                  if (
-                                    !value ||
-                                    getFieldValue("newPassword") === value
-                                  ) {
-                                    return Promise.resolve();
-                                  }
-                                  return Promise.reject(
-                                    new Error("Mật khẩu xác nhận không khớp!")
-                                  );
-                                },
-                              }),
-                            ]}
-                          >
-                            <Input.Password
-                              prefix={<LockOutlined />}
-                              placeholder="Xác nhận mật khẩu mới"
-                              size="large"
-                              iconRender={(visible) =>
-                                visible ? (
-                                  <EyeInvisibleOutlined />
-                                ) : (
-                                  <EyeOutlined />
-                                )
-                              }
-                            />
-                          </Form.Item>
-                        </UserInfoSection>
+                            <Form.Item name="email" label="Email">
+                              <Input
+                                prefix={<UserOutlined />}
+                                disabled
+                                size="large"
+                              />
+                            </Form.Item>
+                          </UserInfoSection>
 
-                        <ProfileButton
-                          type="primary"
-                          htmlType="submit"
-                          loading={passwordLoading}
+                          <ProfileButton
+                            type="primary"
+                            htmlType="submit"
+                            loading={loading}
+                          >
+                            Cập nhật thông tin
+                          </ProfileButton>
+                        </Form>
+                      </FormContent>
+                    </TabContent>
+                  ),
+                },
+                {
+                  key: "password",
+                  label: (
+                    <span>
+                      <LockOutlined />
+                      Đổi mật khẩu
+                    </span>
+                  ),
+                  children: (
+                    <TabContent>
+                      <FormContent>
+                        <AlertMessage>
+                          <SafetyOutlined /> Để bảo vệ tài khoản của bạn, vui
+                          lòng sử dụng mật khẩu mạnh và không chia sẻ với người
+                          khác.
+                        </AlertMessage>
+
+                        <Form
+                          form={passwordForm}
+                          name="password"
+                          onFinish={onPasswordFinish}
+                          layout="vertical"
                         >
-                          Đổi mật khẩu
-                        </ProfileButton>
-                      </Form>
-                    </FormContent>
-                  </TabContent>
-                ),
-              },
-            ]}
-          />
+                          <UserInfoSection>
+                            <SectionTitle>
+                              <LockOutlined />
+                              Thay đổi mật khẩu
+                            </SectionTitle>
+
+                            <Form.Item
+                              name="currentPassword"
+                              label="Mật khẩu hiện tại"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Vui lòng nhập mật khẩu hiện tại!",
+                                },
+                              ]}
+                            >
+                              <Input.Password
+                                prefix={<LockOutlined />}
+                                placeholder="Nhập mật khẩu hiện tại"
+                                size="large"
+                                iconRender={(visible) =>
+                                  visible ? (
+                                    <EyeInvisibleOutlined />
+                                  ) : (
+                                    <EyeOutlined />
+                                  )
+                                }
+                              />
+                            </Form.Item>
+                            <Form.Item
+                              name="newPassword"
+                              label="Mật khẩu mới"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Vui lòng nhập mật khẩu mới!",
+                                },
+                                {
+                                  min: 6,
+                                  message: "Mật khẩu phải có ít nhất 6 ký tự!",
+                                },
+                                ({ getFieldValue }) => ({
+                                  validator(_, value) {
+                                    if (
+                                      !value ||
+                                      getFieldValue("currentPassword") !== value
+                                    ) {
+                                      return Promise.resolve();
+                                    }
+                                    return Promise.reject(
+                                      new Error(
+                                        "Mật khẩu mới không được trùng với mật khẩu hiện tại!"
+                                      )
+                                    );
+                                  },
+                                }),
+                              ]}
+                            >
+                              <Input.Password
+                                prefix={<LockOutlined />}
+                                placeholder="Nhập mật khẩu mới"
+                                size="large"
+                                iconRender={(visible) =>
+                                  visible ? (
+                                    <EyeInvisibleOutlined />
+                                  ) : (
+                                    <EyeOutlined />
+                                  )
+                                }
+                              />
+                            </Form.Item>
+
+                            <Form.Item
+                              name="confirmPassword"
+                              label="Xác nhận mật khẩu mới"
+                              dependencies={["newPassword"]}
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Vui lòng xác nhận mật khẩu mới!",
+                                },
+                                ({ getFieldValue }) => ({
+                                  validator(_, value) {
+                                    if (
+                                      !value ||
+                                      getFieldValue("newPassword") === value
+                                    ) {
+                                      return Promise.resolve();
+                                    }
+                                    return Promise.reject(
+                                      new Error("Mật khẩu xác nhận không khớp!")
+                                    );
+                                  },
+                                }),
+                              ]}
+                            >
+                              <Input.Password
+                                prefix={<LockOutlined />}
+                                placeholder="Xác nhận mật khẩu mới"
+                                size="large"
+                                iconRender={(visible) =>
+                                  visible ? (
+                                    <EyeInvisibleOutlined />
+                                  ) : (
+                                    <EyeOutlined />
+                                  )
+                                }
+                              />
+                            </Form.Item>
+                          </UserInfoSection>
+
+                          <ProfileButton
+                            type="primary"
+                            htmlType="submit"
+                            loading={passwordLoading}
+                          >
+                            Đổi mật khẩu
+                          </ProfileButton>
+                        </Form>
+                      </FormContent>
+                    </TabContent>
+                  ),
+                },
+              ]}
+            />
           </ProfileCard>
         </ProfileWrapper>
       </ProfileContainer>
+      <FloatingButton
+        onClick={handleOpenContactModal}
+        tooltip="Liên hệ với chúng tôi"
+      />
+
+      <ContactModal
+        visible={contactModalVisible}
+        onClose={handleCloseContactModal}
+      />
     </>
   );
 }
